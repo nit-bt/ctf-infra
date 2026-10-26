@@ -11,6 +11,77 @@
 
 Static = normal CTFd challenge with a file/flag. Instanced = `docker` type, each player gets their own container.
 
+## Static challenges
+
+Static = the player downloads a file (or just reads the description) and solves it on their own machine.
+The **file is the puzzle** (pcap, image, disk image, `encrypt.py` + `output.txt`…), the flag is hidden inside it.
+The correct flag is told to CTFd separately.
+
+CTFd stores uploaded files itself (platform: `.data/CTFd/uploads`), no challenge server involved.
+
+### Option A: click it in
+Admin → Challenges → **+** → type **standard** → name, category, description, value → **Create** → flag → **Finish** → **Files** tab → upload → **Visible**.
+
+### Option B: ctfcli (recommended for many challenges, and for moving to Contabo)
+
+Keep every challenge as a folder in a private git repo, cloned on the platform at `/opt/ctf/challenges`:
+```
+/opt/ctf/challenges/
+├── .ctf/config              ← CTFd URL + admin token, NEVER commit
+├── .gitignore               ← .ctf/config
+├── forensics/lost-packets/
+│   ├── challenge.yml        ← name, points, flag, files, hints
+│   ├── dist/capture.zip     ← what players download
+│   └── solve/writeup.md     ← solution, not uploaded
+└── osint/where-am-i/
+    └── challenge.yml
+```
+
+`challenge.yml`:
+```yaml
+name: "Lost Packets"
+author: "okie"
+category: Forensics
+description: |
+  We captured some traffic from a suspicious laptop.
+value: 100
+type: standard
+flags:
+  - flag{h1dd3n_1n_th3_p4ck3ts}          # exact match
+  - type: static
+    content: flag{hidden_in_the_packets}
+    data: case_insensitive               # any case
+files:
+  - dist/capture.zip
+hints:
+  - content: "Follow the TCP stream"
+    cost: 10
+state: hidden
+version: "0.1"
+```
+
+One-time setup:
+```bash
+sudo apt install -y pipx && pipx install ctfcli && pipx ensurepath    # log out/in
+cd /opt/ctf/challenges && echo ".ctf/config" >> .gitignore
+ctf init --no_commit
+#   URL:   http://localhost
+#   token: CTFd → Settings → Access Tokens → Generate (as admin)
+#   integrations: Enter · confirm: y
+```
+
+Daily use:
+```bash
+ctf challenge add forensics/lost-packets    # register a new folder (once)
+ctf challenge install                       # create new ones in CTFd
+ctf challenge sync --ignore solution        # push edits (flag, points, files, state)
+```
+
+Gotchas (found while testing on CTFd 3.7.7 + ctfcli 0.1.8):
+- `ctf init` **commits the admin token** into git unless you pass `--no_commit`.
+- `sync` without `--ignore solution` crashes on 3.7.7 (it calls a CTFd 3.8 endpoint) and stops **before** applying `state`.
+- `install` skips challenges that already exist; use `sync` for those.
+
 ## Build an instanced challenge image
 
 Rules:

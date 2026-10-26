@@ -70,3 +70,19 @@ Rules re-apply on boot and on Docker restart.
 ## 5. GCP only
 
 Give the VM **No service account** ([01](01-gcp-sandbox.md#challenge-vm-no-service-account)). Stopping it changes the external IP → update *Public address* in Docker Config.
+
+## Adding another challenge server
+
+Tested with 2 servers on GCP. Repeat for each new one:
+
+1. Create the VM (GCP: same zone, tag `challenge-ctf`, no service account)
+2. `sudo apt install -y git` if missing → clone the plugin repo
+3. `install-docker.sh` → `Hello from Docker!`
+4. `setup-docker-tls.sh <THIS server's private IP>`, check `hostname -I`, not another server's IP
+5. `harden-chal-host.sh <platform IP>` → `6 passed`
+6. Copy **this server's** 3 cert files into their own folder (`ctf-certs-chal2`, …)
+7. CTFd → Docker Config → **+ Add host** (form says *New host*, not *Edit …*) → **UP**
+8. Allow its `ctf/...` repos → point challenges at it
+
+Each server has its **own** CA and certs. Mixing them up (chal-1's files on the chal-2 entry) shows **DOWN**.
+To "change the locks" on one server: rerun `setup-docker-tls.sh` there and upload the new files to its entry only.

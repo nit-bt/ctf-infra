@@ -27,7 +27,7 @@ How:
 | Name | `platform-ctf` | `challenge-ctf` |
 | Region / zone | `asia-southeast1` / **same zone for both** | same |
 | Machine | E2 custom, 4 vCPU / 8 GB | E2 custom, 4 vCPU / 8 GB |
-| OS | Ubuntu 24.04 LTS x86/64 | Ubuntu 24.04 LTS x86/64 |
+| OS | Ubuntu 26.04 LTS x86/64 (normal image, not *Minimal*) | same |
 | Disk | 30 GB balanced | 40 GB balanced |
 | Network tag | `platform-ctf` | `challenge-ctf` |
 | Allow HTTP/HTTPS | ✅ | ❌ |
@@ -38,6 +38,8 @@ How:
 Why the same zone: platform ↔ challenge traffic is free and fastest.
 Why Standard tier: cheaper, 200 GB/month free egress, players and servers are all in SEA anyway.
 Specs match Contabo's 4 vCPU / 8 GB so tests mean something.
+The *Minimal* Ubuntu image has no `git`; if you end up on it: `sudo apt install -y git`.
+Extra test challenge servers (e.g. `challenge-ctf-2`) can be `e2-medium`; set **No service account** and the sudo startup script while creating, and give them the same `challenge-ctf` tag so the firewall rules apply.
 
 Ephemeral external IPs **change on every stop/start** → update the challenge server's *Public address* in CTFd after a restart. Internal IPs don't change.
 

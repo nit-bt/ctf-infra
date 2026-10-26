@@ -9,7 +9,8 @@ Status: **plan**. Everything here worked on GCP except the parts marked *(to tes
 | Internal (Nov) | 1 × 4 vCPU / 8 GB | 1 × 4 vCPU / 8 GB |
 | ATC (Feb) | same platform, fresh install | 3 × 4 vCPU / 8 GB (web / pwn / reverse) |
 
-Region: Japan (our pick; compare latency with Singapore before ordering). Ubuntu 24.04.
+Region: Japan (our pick; compare latency with Singapore before ordering).
+OS: Ubuntu 26.04 LTS, same as the GCP servers. If Contabo doesn't offer it, 24.04 works with the same scripts.
 After the internal CTF: back up, cancel; for ATC set up **fresh** from these docs (different players, Teams mode, new challenges).
 
 ## Differences from GCP

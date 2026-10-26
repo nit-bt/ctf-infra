@@ -13,6 +13,7 @@ Everything we actually hit, with the fix.
 | Can't change service account | VM running | Stop the VM first |
 | "Some features are restricted … data sovereignty" banner | Org policies | Info only; check *Details* if an option you need is greyed |
 | Challenge links stopped working after a restart | Ephemeral external IP changed | Update *Public address* in Docker Config |
+| `git: command not found` on a new VM | *Minimal* Ubuntu image | `sudo apt install -y git` (or recreate with the normal image) |
 
 ## Platform
 
@@ -37,12 +38,16 @@ Everything we actually hit, with the fix.
 | "No free ports left" | Port range full: widen it (and the firewall rule) or add a server |
 | "Could not start container: Cannot reach Docker host…" | Server down / unreachable (CTFd gives up after 10 s) |
 | Instance shows as running right after you open the page | It's an older container still alive; CTFd restarts don't kill containers |
+| "uploaded, new file overwrites" next to the cert fields | That host already has certs; leave empty to keep them. Check the form says *Edit <the right host>* |
 
 ## Challenge server
 
 | Symptom | Fix |
 |---|---|
 | `setup-docker-tls.sh` doesn't print `OK` | `sudo journalctl -u docker -n 50`, usually a typo'd IP or `daemon.json` |
+| `Failed to restart docker.service: Unit docker.service not found` | Docker not installed yet → `install-docker.sh` first, then rerun (newer script versions check this) |
+| `!! x.x.x.x is not an IP of this machine` | You passed another server's IP; use this server's own from `hostname -I` |
+| New host **DOWN** right after adding | Wrong server's cert files, or cert made with the wrong IP → rerun `setup-docker-tls.sh <right IP>` and re-upload |
 | Firewall self-test FAIL | `sudo ctf-docker-firewall status`; rerun `harden-chal-host.sh` |
 | Challenge needs internet / DNS at runtime | Not allowed by design, bake it into the image |
 | setuid binary doesn't escalate in a challenge | `no-new-privileges` is on by design |
