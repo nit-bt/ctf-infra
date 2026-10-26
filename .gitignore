@@ -1,0 +1,12 @@
+# Never commit keys, certs or secrets
+*.pem
+*.key
+*.crt
+*.csr
+.env
+.ctfd_secret_key
+certs/
+docker-client-certs/
+backups/
+*.tar.gz
+*.sql
