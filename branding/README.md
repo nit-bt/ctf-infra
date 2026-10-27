@@ -10,8 +10,7 @@ Club look for the platform, built from the club logo. Everything is applied from
 |---|---|
 | `ctfc-logo.png` | Admin > Config > Logo (navbar) and the home page |
 | `ctfc-badge.png` | spare: flags-only crop |
-| `favicon.ico` | Admin > Config > Logo > Small Icon (browser tab) |
-| `ctfc-logo.png` | uploaded as a file, used on the home page |
+| `favicon.ico` | Admin > Config > Logo > Small Icon (browser tab), full logo |
 | `theme-header.html` | Admin > Config > Theme > Theme Header |
 | `index-page.html` | Admin > Pages > `index` |
 | `icon-180.png`, `icon-512.png` | spare sizes (phone home screen, social posts) |
@@ -29,6 +28,11 @@ Club look for the platform, built from the club logo. Everything is applied from
   - Atkinson Hyperlegible for body text and the flag input, so `0/O` and `1/l` are easy to tell apart.
 - **Shapes:** stepped pixel corners and hard pixel shadows, matching the pixel-art logo.
 - **Dark mode only:** the light/dark switch is hidden.
+- **Correct flag:** a "Flag captured!" popup with the challenge name and points, pixel confetti in the club colors, and a random meme.
+  - Memes go in the plugin: `docker_challenges/assets/memes/solved.png`, `solved-1.png` ... `solved-20.png`. No meme files = popup without an image.
+  - Turns off the animation for players who set "reduce motion" on their device.
+
+![Flag captured popup](previews/solved.png)
 
 ## Apply it (fresh CTFd)
 
@@ -48,7 +52,7 @@ Club look for the platform, built from the club logo. Everything is applied from
    - Replace `LOGO_URL` with the URL from step 4.
    - Edit the date and rules text, then Save.
 6. **Check.** Open the site in a private window. You should see:
-   - the badge in the navbar,
+   - the logo in the navbar,
    - the flag favicon,
    - cream challenge cards.
 
