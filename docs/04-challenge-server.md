@@ -41,6 +41,7 @@ Admin → Plugins → **Docker Config** → **+ Add host**
 | Public address | public IP or `chalN.<domain>`, what players connect to |
 | Port min / max | `30000` / `31000`, must match the firewall rule |
 | Memory / CPU / processes | 256 MB / 0.5 / 256 (raise per server if a challenge needs it) |
+| Instance lifetime / Revert after / Cooldown | 120 min / 5 min / 30 s. Lifetime 0 = no limit. Only affects instances started after saving |
 | TLS | **Yes** + upload `ca.pem`, `cert.pem`, `key.pem` |
 
 Save → host shows **UP**. Then tick its **Allowed repositories** → Save.
