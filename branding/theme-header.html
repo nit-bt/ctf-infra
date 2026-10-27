@@ -65,7 +65,7 @@ a { text-underline-offset: 3px; }
 
 /* ---------- navbar: quiet, with a ribbon-coloured edge ---------- */
 .navbar.bg-dark { background: var(--ctfc-night-2) !important; border-bottom: var(--ctfc-px) solid var(--ctfc-plum); }
-.navbar .nav-link { color: var(--ctfc-muted); }
+.navbar .nav-link, .navbar .dropdown-item { font-family: var(--ctfc-pixel); font-weight: 400; color: var(--ctfc-muted); }
 .navbar .nav-link:hover, .navbar .nav-link:focus-visible { color: var(--ctfc-cream); }
 .navbar-brand { font-family: var(--ctfc-pixel); font-weight: 400; color: var(--ctfc-cream) !important; }
 .navbar-brand img.ctf_logo { height: 40px; width: auto; image-rendering: auto; }
@@ -172,8 +172,8 @@ a { text-underline-offset: 3px; }
 
 /* ---------- login / register ---------- */
 form .form-label, form label { color: var(--ctfc-cream); }
-.footer { color: var(--ctfc-muted); }
-.footer a, .footer .text-muted { color: var(--ctfc-muted) !important; }
+/* no "Powered by CTFd" footer */
+.footer { display: none !important; }
 
 /* ---------- home page (Admin > Pages > index) ---------- */
 .ctfc-hero { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(1.5rem, 4vw, 3.5rem); align-items: center; padding: clamp(2rem, 6vw, 4.5rem) 0 2.5rem; }
