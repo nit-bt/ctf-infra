@@ -1,0 +1,203 @@
+<!-- CTFC theme for CTFd core-beta. Paste into Admin > Config > Theme > Theme Header. -->
+<script>
+  /* the design is dark-only: lock core-beta's colour mode */
+  try { localStorage.setItem("theme", "dark"); } catch (e) {}
+  document.documentElement.setAttribute("data-bs-theme", "dark");
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Tiny5&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens (all taken from the club logo) ---------- */
+:root, [data-bs-theme="dark"] {
+  --ctfc-night: #1a1424;      /* page */
+  --ctfc-night-2: #241b31;    /* panels */
+  --ctfc-night-3: #2f2440;    /* raised / hover */
+  --ctfc-plum: #6b2d5c;       /* ribbon */
+  --ctfc-plum-hi: #8f3d7b;
+  --ctfc-red: #b5532e;        /* red flag: not captured yet */
+  --ctfc-red-dk: #7a3317;
+  --ctfc-blue: #3a6fd8;       /* blue flag: captured */
+  --ctfc-blue-dk: #22489a;
+  --ctfc-cream: #f4f5ed;      /* plate */
+  --ctfc-cream-dk: #d9d6c6;
+  --ctfc-ink: #2b2034;        /* text on cream */
+  --ctfc-muted: #b4aac0;
+  --ctfc-px: 4px;             /* one "pixel" of the stepped corners */
+  --ctfc-pixel: "Tiny5", "Atkinson Hyperlegible", system-ui, sans-serif;
+  --ctfc-text: "Atkinson Hyperlegible", system-ui, sans-serif;
+
+  --bs-body-bg: var(--ctfc-night);
+  --bs-body-color: var(--ctfc-cream);
+  --bs-secondary-color: var(--ctfc-muted);
+  --bs-tertiary-bg: var(--ctfc-night-2);
+  --bs-border-color: #3d3050;
+  --bs-link-color: #8fb0f0;
+  --bs-link-color-rgb: 143, 176, 240;
+  --bs-link-hover-color: var(--ctfc-cream);
+  --bs-link-hover-color-rgb: 244, 245, 237;
+  --bs-font-sans-serif: var(--ctfc-text);
+  --bs-body-font-family: var(--ctfc-text);
+  --bs-emphasis-color: var(--ctfc-cream);
+}
+
+/* stepped "pixel" corners, like the ribbon edges */
+.ctfc-steps, .challenge-button, #challenge-window .modal-content, .ctfc-plate,
+.btn, .form-control, .form-select, #warningModal > div {
+  --s: var(--ctfc-px);
+  clip-path: polygon(
+    0 calc(var(--s) * 2), var(--s) calc(var(--s) * 2), var(--s) var(--s), calc(var(--s) * 2) var(--s), calc(var(--s) * 2) 0,
+    calc(100% - var(--s) * 2) 0, calc(100% - var(--s) * 2) var(--s), calc(100% - var(--s)) var(--s), calc(100% - var(--s)) calc(var(--s) * 2), 100% calc(var(--s) * 2),
+    100% calc(100% - var(--s) * 2), calc(100% - var(--s)) calc(100% - var(--s) * 2), calc(100% - var(--s)) calc(100% - var(--s)), calc(100% - var(--s) * 2) calc(100% - var(--s)), calc(100% - var(--s) * 2) 100%,
+    calc(var(--s) * 2) 100%, calc(var(--s) * 2) calc(100% - var(--s)), var(--s) calc(100% - var(--s)), var(--s) calc(100% - var(--s) * 2), 0 calc(100% - var(--s) * 2));
+  border-radius: 0 !important;
+}
+.btn, .form-control, .form-select { --s: 3px; }
+
+body { background: var(--ctfc-night); color: var(--ctfc-cream); font-family: var(--ctfc-text); font-size: 1.0625rem; line-height: 1.6; }
+h1, h2, h3, h4, h5, .navbar, .btn, .nav-tabs .nav-link { font-family: var(--ctfc-pixel); letter-spacing: 0; }
+h1, h2, h3, h4, h5 { font-weight: 400; color: var(--ctfc-cream); }
+/* Tiny5 has one weight: never fake bold/italic (it smears the pixels) */
+h1, h2, h3, h4, h5, .btn, .ctfc-cta, .nav-tabs .nav-link, .challenge-button .challenge-inner span { font-synthesis: none; }
+a { text-underline-offset: 3px; }
+::selection { background: var(--ctfc-plum-hi); color: var(--ctfc-cream); }
+:focus-visible { outline: 3px solid var(--ctfc-cream) !important; outline-offset: 2px; }
+
+/* ---------- navbar: quiet, with a ribbon-coloured edge ---------- */
+.navbar.bg-dark { background: var(--ctfc-night-2) !important; border-bottom: var(--ctfc-px) solid var(--ctfc-plum); }
+.navbar .nav-link { color: var(--ctfc-muted); }
+.navbar .nav-link:hover, .navbar .nav-link:focus-visible { color: var(--ctfc-cream); }
+.navbar-brand { font-family: var(--ctfc-pixel); font-weight: 400; color: var(--ctfc-cream) !important; }
+.navbar-brand img.ctf_logo { height: 40px; width: auto; image-rendering: auto; }
+.theme-switch { display: none !important; }        /* dark only */
+
+/* ---------- page titles ---------- */
+.jumbotron { background: transparent; color: var(--ctfc-cream); text-align: left; padding: 3.5rem 0 0; margin-bottom: 0; }
+.jumbotron h1 { font-size: clamp(2rem, 4vw, 2.75rem); margin: 0; }
+.jumbotron h1::after {     /* a little stepped ribbon bar under the title */
+  content: ""; display: block; width: 7.5rem; height: 8px; margin-top: .75rem;
+  background:
+    linear-gradient(var(--ctfc-plum) 0 0) 0 4px / 100% 4px no-repeat,
+    linear-gradient(var(--ctfc-plum-hi) 0 0) 4px 0 / calc(100% - 8px) 4px no-repeat;
+}
+
+/* ---------- challenge board: red flag = to capture, blue flag = captured ---------- */
+.category-header h3 { font-size: 1.5rem; color: var(--ctfc-cream); display: flex; align-items: center; gap: .6rem; }
+.category-header h3::before { content: ""; width: 8px; height: 8px; background: var(--ctfc-plum-hi); box-shadow: 4px 4px 0 var(--ctfc-plum); }
+.challenges-row > div { filter: drop-shadow(0 var(--ctfc-px) 0 #0d0912); }   /* pixel shadow (clip-path cuts box-shadow) */
+
+[data-bs-theme] .challenge-button, [data-bs-theme] .challenge-button.btn-dark {
+  position: relative; text-align: left;
+  background: var(--ctfc-cream); color: var(--ctfc-ink);
+  border: 0; box-shadow: inset 0 calc(var(--ctfc-px) * -1) 0 var(--ctfc-cream-dk);
+  min-height: 7.5rem; padding: 1rem 1rem 1.1rem 1rem;
+  transition: transform .12s steps(2), background-color .12s;
+}
+[data-bs-theme] .challenge-button .challenge-inner { margin: 0 !important; padding-left: 1.75rem; display: flex; flex-direction: column; gap: .35rem; }
+[data-bs-theme] .challenge-button .challenge-inner p { margin: 0; font-family: var(--ctfc-text); font-weight: 700; font-size: 1.05rem; line-height: 1.3; }
+[data-bs-theme] .challenge-button .challenge-inner span { font-family: var(--ctfc-pixel); font-weight: 400; font-size: 1.6rem; line-height: 1; }
+[data-bs-theme] .challenge-button .challenge-inner span::after { content: " pts"; font-size: .9rem; opacity: .7; }
+[data-bs-theme] .challenge-button::before {   /* the little pixel flag */
+  content: ""; position: absolute; left: 1rem; top: 1.1rem; width: 14px; height: 18px;
+  background:
+    linear-gradient(var(--ctfc-red) 0 0) 2px 0 / 12px 8px no-repeat,
+    linear-gradient(var(--ctfc-red-dk) 0 0) 2px 8px / 12px 2px no-repeat,
+    linear-gradient(#8e8698 0 0) 0 0 / 2px 18px no-repeat;
+}
+[data-bs-theme] .challenge-button:hover, [data-bs-theme] .challenge-button:focus-visible { background: #ffffff; color: var(--ctfc-ink); transform: translateY(-2px); }
+[data-bs-theme] .challenge-button:focus-visible { outline: 3px solid var(--ctfc-blue) !important; outline-offset: -7px; }
+
+[data-bs-theme] .challenge-button.challenge-solved, [data-bs-theme] .challenge-button.challenge-solved:hover {
+  background: var(--ctfc-blue); color: var(--ctfc-cream);
+  box-shadow: inset 0 calc(var(--ctfc-px) * -1) 0 var(--ctfc-blue-dk);
+}
+[data-bs-theme] .challenge-button.challenge-solved::before {
+  background:
+    linear-gradient(var(--ctfc-cream) 0 0) 2px 0 / 12px 8px no-repeat,
+    linear-gradient(var(--ctfc-cream-dk) 0 0) 2px 8px / 12px 2px no-repeat,
+    linear-gradient(var(--ctfc-cream) 0 0) 0 0 / 2px 18px no-repeat;
+}
+[data-bs-theme] .challenge-button.challenge-solved .challenge-inner p::after { content: "Captured"; display: block; font-weight: 400; font-size: .85rem; opacity: .85; }
+[data-bs-theme] .challenge-button.challenge-solved:focus-visible { outline-color: var(--ctfc-cream) !important; }
+
+/* ---------- challenge window ---------- */
+#challenge-window .modal-content {
+  background: var(--ctfc-night-2); color: var(--ctfc-cream); border: 0;
+  box-shadow: inset 0 0 0 var(--ctfc-px) var(--ctfc-plum);
+}
+#challenge-window .btn-close { filter: invert(1) grayscale(1) brightness(1.8); opacity: .8; }
+#challenge-window .nav-tabs { border-bottom: 2px solid var(--ctfc-plum); }
+#challenge-window .nav-tabs .nav-link { color: var(--ctfc-muted); border: 0; background: transparent; }
+#challenge-window .nav-tabs .nav-link.active { color: var(--ctfc-cream); background: var(--ctfc-plum); }
+#challenge-window .challenge-name { font-size: 2rem; }
+#challenge-window .challenge-value { font-family: var(--ctfc-pixel); color: var(--ctfc-cream-dk); }
+#challenge-window .challenge-desc { display: block; max-width: 62ch; margin: 0 auto 1rem; }
+#challenge-window pre, #docker_container pre { background: var(--ctfc-night); color: var(--ctfc-cream); padding: .9rem 1rem; font-size: .95rem; }
+#challenge-window .challenge-connection-info { display: block; text-align: center; }
+.challenge-input.form-control, .form-control, .form-select {
+  background: var(--ctfc-cream); color: var(--ctfc-ink); border: 0; font-family: var(--ctfc-text); font-size: 1.1rem;
+}
+.form-control::placeholder { color: #7d7486; }
+.form-control:focus { background: #ffffff; color: var(--ctfc-ink); box-shadow: none; outline: 3px solid var(--ctfc-blue) !important; outline-offset: -5px; }
+
+/* buttons: red = act (submit, start), blue = go somewhere */
+.btn { border: 0; font-weight: 400; padding: .55rem 1.1rem; box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .28); }
+.btn:active { box-shadow: inset 0 3px 0 rgba(0, 0, 0, .28); }
+.challenge-submit.btn, .btn-outline-secondary.challenge-submit, #docker_container .btn-dark, .btn-danger {
+  background: var(--ctfc-red); color: var(--ctfc-cream);
+}
+.challenge-submit.btn:hover, #docker_container .btn-dark:hover, .btn-danger:hover { background: #c9643b; color: #fff; }
+.btn-primary, .btn-info, .btn-file { background: var(--ctfc-blue); color: var(--ctfc-cream); }
+.btn-primary:hover, .btn-info:hover, .btn-file:hover { background: #4b80e6; color: #fff; }
+.btn-secondary, .btn-outline-secondary { background: var(--ctfc-night-3); color: var(--ctfc-cream); }
+.alert { border-radius: 0; border: 0; }
+.alert-success { background: var(--ctfc-blue); color: var(--ctfc-cream); }
+.alert-danger { background: var(--ctfc-red); color: var(--ctfc-cream); }
+
+/* docker plugin popups */
+#warningModal > div { background: var(--ctfc-night-2) !important; color: var(--ctfc-cream) !important; box-shadow: inset 0 0 0 var(--ctfc-px) var(--ctfc-plum) !important; border-radius: 0 !important; }
+#warningModal .modal-header { background: var(--ctfc-plum) !important; color: var(--ctfc-cream) !important; font-family: var(--ctfc-pixel); }
+#warningModal .modal-header h5 { font-family: var(--ctfc-pixel); }
+#warningModal .modal-header button { color: var(--ctfc-cream) !important; }
+#warningModal .modal-body { color: var(--ctfc-cream) !important; }
+#warningModal .modal-footer { border-top-color: #3d3050 !important; }
+
+/* ---------- tables (scoreboard, users) ---------- */
+.table { --bs-table-bg: transparent; --bs-table-color: var(--ctfc-cream); --bs-table-border-color: #3d3050; --bs-table-striped-bg: rgba(255,255,255,.03); --bs-table-hover-bg: var(--ctfc-night-3); }
+.table thead th { font-family: var(--ctfc-pixel); font-weight: 400; color: var(--ctfc-muted); border-bottom: 2px solid var(--ctfc-plum); }
+/* the score chart draws its own dark text, so it sits on a cream plate like the challenge cards */
+#score-graph { background: var(--ctfc-cream); padding: .75rem .5rem 0; margin-bottom: 1.5rem; }
+#score-graph, #keys-pie-graph, #categories-pie-graph { --s: var(--ctfc-px); clip-path: polygon(0 calc(var(--s) * 2), var(--s) calc(var(--s) * 2), var(--s) var(--s), calc(var(--s) * 2) var(--s), calc(var(--s) * 2) 0, calc(100% - var(--s) * 2) 0, calc(100% - var(--s) * 2) var(--s), calc(100% - var(--s)) var(--s), calc(100% - var(--s)) calc(var(--s) * 2), 100% calc(var(--s) * 2), 100% calc(100% - var(--s) * 2), calc(100% - var(--s)) calc(100% - var(--s) * 2), calc(100% - var(--s)) calc(100% - var(--s)), calc(100% - var(--s) * 2) calc(100% - var(--s)), calc(100% - var(--s) * 2) 100%, calc(var(--s) * 2) 100%, calc(var(--s) * 2) calc(100% - var(--s)), var(--s) calc(100% - var(--s)), var(--s) calc(100% - var(--s) * 2), 0 calc(100% - var(--s) * 2)); }
+#keys-pie-graph, #categories-pie-graph { background: var(--ctfc-cream); }
+
+/* ---------- login / register ---------- */
+form .form-label, form label { color: var(--ctfc-cream); }
+.footer { color: var(--ctfc-muted); }
+.footer a, .footer .text-muted { color: var(--ctfc-muted) !important; }
+
+/* ---------- home page (Admin > Pages > index) ---------- */
+.ctfc-hero { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(1.5rem, 4vw, 3.5rem); align-items: center; padding: clamp(2rem, 6vw, 4.5rem) 0 2.5rem; }
+.ctfc-hero img { width: 100%; height: auto; display: block; filter: drop-shadow(0 6px 0 #0d0912); }
+.ctfc-hero h1 { font-size: clamp(2.2rem, 5vw, 3.4rem); line-height: 1.05; margin: 0 0 1rem; }
+.ctfc-hero p { font-size: 1.2rem; color: var(--ctfc-cream-dk); max-width: 34ch; margin: 0 0 1.5rem; }
+.ctfc-cta { display: inline-block; font-family: var(--ctfc-pixel); font-weight: 400; font-size: 1.15rem; text-decoration: none;
+  background: var(--ctfc-red); color: var(--ctfc-cream) !important; padding: .8rem 1.4rem; box-shadow: inset 0 -4px 0 var(--ctfc-red-dk); }
+.ctfc-cta:hover { background: #c9643b; }
+.ctfc-cta:active { box-shadow: inset 0 4px 0 var(--ctfc-red-dk); }
+.ctfc-info { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; padding-bottom: 4rem; }
+.ctfc-plate { background: var(--ctfc-night-2); padding: 1.4rem 1.5rem 1.5rem; box-shadow: inset 0 0 0 2px #3d3050; }
+.ctfc-plate h2 { font-size: 1.25rem; margin: 0 0 .9rem; }
+.ctfc-plate dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: .45rem 1rem; }
+.ctfc-plate dt { color: var(--ctfc-muted); font-weight: 400; }
+.ctfc-plate dd { margin: 0; }
+.ctfc-plate ol, .ctfc-plate ul { margin: 0; padding-left: 1.25rem; }
+.ctfc-plate li { margin-bottom: .45rem; }
+.ctfc-plate li::marker { font-family: var(--ctfc-pixel); color: var(--ctfc-plum-hi); }
+.ctfc-plate code { color: var(--ctfc-cream); background: var(--ctfc-night); padding: .1rem .35rem; font-size: .95em; }
+@media (max-width: 860px) {
+  .ctfc-hero { grid-template-columns: 1fr; }
+  .ctfc-hero img { max-width: 360px; }
+  .ctfc-info { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { .challenge-button { transition: none; } .challenge-button:hover { transform: none; } }
+</style>

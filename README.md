@@ -44,6 +44,7 @@ It also holds `setup-docker-tls.sh` and the `firewall/` scripts.
 | 5 | [docs/05-challenges.md](docs/05-challenges.md) | Building and adding instanced challenges |
 | 6 | [docs/06-testing.md](docs/06-testing.md) | End-to-end checklist |
 | 7 | [docs/07-production-contabo.md](docs/07-production-contabo.md) | Moving to Contabo, domain, HTTPS, backups |
+| - | [branding/](branding/) | Club look: logo, favicon, theme, home page |
 | - | [docs/emergency.md](docs/emergency.md) | **Event day:** alert → fix, fire drill |
 | - | [docs/troubleshooting.md](docs/troubleshooting.md) | Every error we hit and the fix |
 | - | [docs/decisions.md](docs/decisions.md) | Why things are the way they are |
