@@ -68,6 +68,26 @@ scp <user>@<platform>:/opt/ctf/backups/ctfd-*.tar.gz .
 ```
 Daily cron (see script header). Before cancelling a server: final backup, copy it off, check it opens.
 
+**On event day** back up every hour (9:00-17:00) instead of daily, and copy the latest one off at lunch and at the end:
+```bash
+sudo crontab -e
+# add:
+0 9-17 * * * /opt/ctf/ctf-infra/scripts/backup-ctfd.sh >> /var/log/ctfd-backup.log 2>&1
+```
+
+### Restore
+
+```bash
+mkdir -p /tmp/restore && sudo tar xzf ctfd-YYYYMMDD-HHMM.tar.gz -C /tmp/restore
+cd /opt/ctf/CTFd
+sudo docker compose stop ctfd                       # players see an error for ~1 min
+sudo docker compose exec -T db sh -c 'mariadb -uroot -p"$MARIADB_ROOT_PASSWORD"' < /tmp/restore/ctfd.sql
+sudo mkdir -p .data/CTFd/uploads && sudo cp -a /tmp/restore/uploads/. .data/CTFd/uploads/
+sudo cp -a /tmp/restore/.ctfd_secret_key .
+sudo docker compose start ctfd
+```
+The dump replaces the whole `ctfd` database (users, solves, challenges, config). Instances still running on challenge servers are cleaned up by the sweep. Practise this once on GCP before the event.
+
 Cancelling a Contabo VPS **wipes the disk**, snapshots included. Check Contabo's cancellation notice period so you're not billed an extra month.
 
 ## Timeline (internal CTF)
