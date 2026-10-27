@@ -150,5 +150,5 @@ curl http://127.0.0.1:30500
 | Containers at once | 1 per player (Teams mode: 1 per team) |
 | Stop | any time; then 30 s before restarting that challenge |
 | Revert (fresh container) | after 5 min |
-| Auto-removed | after 2 h, or when the challenge is solved |
+| Auto-removed | when the challenge is solved, or after 2 h (checked at most once a minute while people use the site, and whenever an admin opens Docker Status) |
 | Admin | Docker Status page: see / kill any container, nuke all |

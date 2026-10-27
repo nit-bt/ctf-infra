@@ -1,6 +1,7 @@
 # Load test · GCP sandbox · 27 Oct 2026
 
 **Result: PASS.** 25 players starting at the same second all got a working instance, spread over 2 challenge servers.
+Stress run with 100: 99/100. The 1 failure was a port clash, now fixed (see the 100-player section).
 
 ## Setup
 
@@ -35,12 +36,28 @@ Method: 25 hidden players (`loadtest-01..25`) logged in, then all pressed **Star
 
 CPU idle on all containers. No swap on either server.
 
+## Stress run: 100 players at once
+
+| | |
+|---|---|
+| Started OK | **99 / 100** |
+| Reachable | 99 / 99 |
+| Start time | median **11.0 s**, 95% 19.2 s, slowest 19.4 s |
+| Whole burst | 19.5 s |
+| Split | chal-1: 50 · chal-2: 49 |
+| RAM | chal-1: 1.2 / 7.7 GB · chal-2: 1.0 / 3.8 GB |
+| Failure | `failed to set up container networking: driver failed programming external connectivity` on chal-2 |
+
+The failure: two of the 50 players on chal-2 were handed the same random port in the same second (with 50 parallel picks from 1,000 ports this is more likely than not). Start times grow to ~11 s because CTFd runs with 1 worker and every start does several Docker calls.
+100 at once is 4× what either event needs (internal: 25 players, ATC: ~25 teams = ~25 containers).
+
 ## Findings
 
 1. **Works at internal-CTF scale.** 25 simultaneous starts is the worst case for the internal CTF (25 solo players), and about the same for ATC (~25 teams, 1 container per team).
 2. **~4.5 s per start** in real conditions (0.9 s in the local test with fake Docker). The difference is real container creation + TLS round-trips. Acceptable for a button players press a few times.
-3. **Abandoned containers are never cleaned up** ⚠️. chal-1 had a 14th container: a manual test instance from 26 Oct 15:53, still running ~20 h later. The 2-hour cleanup only runs when the *same* player starts another container. At an event, every player who leaves an instance running keeps it forever. **Fix before the event** (global cleanup on every start + a cron sweep).
-4. **Test images are not representative.** nginx/whoami use 2-5 MB; real web challenges (Flask, PHP, Node) are typically 30-100 MB. Re-run with the real images once built.
+3. **Abandoned containers were never cleaned up.** chal-1 had an extra container: a manual test instance from 26 Oct 15:53, still running ~20 h later. The 2-hour cleanup only ran when the *same* player started another container. → **Fixed** in plugin `e6f8c0a`: containers older than 2 h are removed for everyone, checked at most once a minute during normal use, and on every admin Docker Status view.
+4. **Port clash under heavy load** (100-player run). → **Fixed** in `e6f8c0a`: ports are reserved in Redis before use (atomic), and a start retries up to 3× with new ports if Docker still reports a clash. Same local 100-player burst after the fix: 100/100, twice.
+5. **Test images are not representative.** nginx/whoami use 2-5 MB; real web challenges (Flask, PHP, Node) are typically 30-100 MB. Re-run with the real images once built.
 
 ## Capacity estimate (worst case: every container at its 256 MB cap)
 
@@ -54,7 +71,9 @@ CPU idle on all containers. No swap on either server.
 
 ## Next
 
-- [ ] Fix finding 3 (stale container cleanup), re-test
+- [x] Fix finding 3 (stale container cleanup), plugin `e6f8c0a`
+- [x] Fix finding 4 (port clash), plugin `e6f8c0a`
+- [ ] Re-run 100 players on GCP with `e6f8c0a` (expect 100/100)
 - [ ] Re-run with real challenge images
 - [ ] Re-run on Contabo before the event (MariaDB + real network)
 - [ ] Delete `loadtest-*` players before the event
