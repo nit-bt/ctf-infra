@@ -85,6 +85,19 @@ monitors: those catch a dead server or site from outside. Result: every problem 
 | Server dead or unreachable | Kuma Ping monitor (Telegram) |
 | Site down from outside (DNS, HTTPS, Cloudflare) | Kuma HTTP monitor (Telegram) |
 
+## 4c. Live status in Discord (optional)
+
+One message per server in a channel (e.g. `#ctf-status`), **edited every minute** by ctf-alert:
+🟢/🔴, the problems if any, RAM, disk, load, instances, "updated x seconds ago". Pin the channel on event day.
+
+1. Discord: create `#ctf-status` (organizers only) → Edit Channel → Integrations → Webhooks → New Webhook → Copy URL.
+   Use a separate webhook from `#ctf-alerts`, so the live messages don't get buried under alerts.
+2. On each server: `sudo nano /etc/default/ctf-alert` → `DISCORD_STATUS_WEBHOOK=<that URL>` → save.
+3. Within a minute the server's card appears. It keeps editing the same message; delete it and a new one appears.
+
+If a server dies, its card stops updating: the "updated" time keeps growing (e.g. "updated 6 minutes ago"),
+and the alerts above tell you why.
+
 ## 5. Status page for players (optional)
 
 Status Pages → New → name it after the event → add the site + server monitors → Save → share the link in the players' channel.

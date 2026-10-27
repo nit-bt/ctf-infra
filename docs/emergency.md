@@ -22,6 +22,8 @@ Discord: channel → Edit Channel → Integrations → Webhooks → New Webhook 
 What it checks every minute: Docker running, RAM and disk below 85 %, containers killed for hitting their RAM cap; platform: site answers and the 4 CTFd containers run; challenge servers: firewall on and Docker API answering; plus the peers.
 You get 🔴 once, a reminder every 15 min while it stays broken, ✅ when it's fixed.
 
+**Live status in Discord:** set `DISCORD_STATUS_WEBHOOK` too and each server keeps one message up to date (RAM, disk, instances), see [monitoring.md](monitoring.md#4c-live-status-in-discord-optional).
+
 **Dashboard:** with Uptime Kuma set up ([monitoring.md](monitoring.md)), add `KUMA_PUSH_URL` to the same config and every check shows up there too.
 
 **Before the event:** install an SSH app on your phone (Termius, JuiceSSH) with your key, and save logins for every server. Do the [fire drill](#fire-drill) once.
