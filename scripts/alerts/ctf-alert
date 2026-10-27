@@ -3,7 +3,11 @@
 #
 #   ctf-alert run      check everything, notify on changes (systemd timer runs this every minute)
 #   ctf-alert status   check everything, print results, send nothing
-#   ctf-alert test     send a test message
+#   ctf-alert test     send a test message (and a push to Uptime Kuma if set)
+#
+# Optional Uptime Kuma (docs/monitoring.md): set KUMA_PUSH_URL to a Push monitor's URL and every
+# run reports there: up/down + what's wrong, and RAM % as the "ping" value (graphed by Kuma).
+# A server that dies stops pushing, so Kuma alerts on it with no PEERS needed.
 #
 # Sends:  🔴 when something breaks, a reminder every REMIND_MIN while it stays broken,
 #         ✅ when it recovers, 🟡 when a container got killed for using too much RAM.
@@ -28,6 +32,7 @@ STATE_DIR=${STATE_DIR:-/var/lib/ctf-alert}
 TLS_DIR=${TLS_DIR:-/etc/docker/tls}
 API_PORT=${API_PORT:-2376}
 TG_API=${TG_API:-https://api.telegram.org}
+KUMA_PUSH_URL=${KUMA_PUSH_URL:-}   # https://<monitor>:3001/api/push/<token>?status=up&msg=OK&ping=
 
 now=$(date +%s)
 declare -A FAIL=()   # key -> message
@@ -44,13 +49,13 @@ check_common() {
     local total avail used
     total=$(awk '/^MemTotal:/ {print $2}' /proc/meminfo)
     avail=$(awk '/^MemAvailable:/ {print $2}' /proc/meminfo)
-    used=$(( (total - avail) * 100 / total ))
+    used=$(( (total - avail) * 100 / total )); RAM_PCT=$used
     if (( used >= RAM_WARN )); then
         fail ram "RAM at ${used}% ($(( avail / 1024 )) MB free)"
     fi
 
     local disk
-    disk=$(df -P / | awk 'NR==2 {gsub("%","",$5); print $5}')
+    disk=$(df -P / | awk 'NR==2 {gsub("%","",$5); print $5}'); DISK_PCT=$disk
     if (( disk >= DISK_WARN )); then
         fail disk "Disk at ${disk}% on /"
     fi
@@ -118,6 +123,14 @@ send() {
     return $ok
 }
 
+# Uptime Kuma push: status up/down, msg, RAM % as "ping"
+kuma_push() {
+    [[ -n $KUMA_PUSH_URL ]] || return 0
+    local status=$1 msg=$2
+    curl -s --max-time 10 -o /dev/null -G "${KUMA_PUSH_URL%%\?*}" \
+        --data-urlencode "status=$status" --data-urlencode "msg=$msg" --data-urlencode "ping=${RAM_PCT:-}" || true
+}
+
 mins() { if (( $1 < 60 )); then echo "<1"; else echo $(( $1 / 60 )); fi; }
 
 # ---------------------------------------------------------------- main
@@ -138,7 +151,9 @@ case "${1:-}" in
         for m in "${INFO[@]}"; do echo "INFO $m"; done
         ;;
     test)
-        if [[ -z $TG_BOT_TOKEN$DISCORD_WEBHOOK ]]; then echo "No TG_BOT_TOKEN/TG_CHAT_ID or DISCORD_WEBHOOK in $CONF"; exit 1; fi
+        if [[ -z $TG_BOT_TOKEN$DISCORD_WEBHOOK$KUMA_PUSH_URL ]]; then echo "No TG_BOT_TOKEN/TG_CHAT_ID, DISCORD_WEBHOOK or KUMA_PUSH_URL in $CONF"; exit 1; fi
+        if [[ -n $KUMA_PUSH_URL ]]; then kuma_push up "Test from $NAME ($ROLE)"; echo "pushed to Uptime Kuma"; fi
+        if [[ -z $TG_BOT_TOKEN$DISCORD_WEBHOOK ]]; then exit 0; fi
         if send "✅ Test from $NAME ($ROLE): alerts are working"; then echo "sent"; else echo "FAILED to send, check token / chat id / webhook"; exit 1; fi
         ;;
     run)
@@ -166,6 +181,12 @@ case "${1:-}" in
             fi
         done
         for m in "${INFO[@]}"; do send "$m"; done
+        if (( ${#FAIL[@]} == 0 )); then
+            kuma_push up "OK. RAM ${RAM_PCT:-?}%, disk ${DISK_PCT:-?}%"
+        else
+            msg=""; for k in "${!FAIL[@]}"; do msg+="${msg:+ | }${FAIL[$k]}"; done
+            kuma_push down "$msg"
+        fi
         echo "$now" > "$STATE_DIR/.last_run"
         ;;
     *)

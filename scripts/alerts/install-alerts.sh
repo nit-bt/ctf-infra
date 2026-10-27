@@ -30,6 +30,8 @@ TG_BOT_TOKEN=
 TG_CHAT_ID=
 # Discord: channel -> Edit Channel -> Integrations -> Webhooks -> New Webhook -> Copy URL
 DISCORD_WEBHOOK=
+# Uptime Kuma (optional, docs/monitoring.md): Add New Monitor -> Push -> copy the Push URL
+KUMA_PUSH_URL=
 
 # --- other servers to watch (name=ip:port, space separated) ---
 # platform: each challenge server's Docker API, e.g.  "chal-1=<chal-1-ip>:2376 chal-2=<chal-2-ip>:2376"

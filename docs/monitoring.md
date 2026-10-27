@@ -64,6 +64,27 @@ Add New Monitor, one per line, interval 60 s, retries 2 (so one slow check isn't
 Don't monitor port 2376: the challenge firewall only lets the platform in (correct), so Kuma would see it as down.
 Group them per event (e.g. tag `internal-2026-11`) and **pause** them when the event's servers are gone.
 
+## 4b. Connect each server's ctf-alert (Push monitors)
+
+Kuma then shows the inside checks too (RAM, disk, firewall, CTFd containers) and the RAM % as a graph,
+and alerts if a server stops reporting (= dead), with no PEERS needed.
+
+Per server:
+1. Kuma → Add New Monitor → type **Push** → name = server name (e.g. `internal-chal-1`) → Heartbeat interval **60**, Retries **2**.
+2. Copy the **Push URL** it shows → Save.
+3. On that server: `sudo nano /etc/default/ctf-alert` → `KUMA_PUSH_URL="<the push URL>"` → save.
+4. `sudo ctf-alert test` → the monitor turns green in Kuma.
+
+Avoid double messages: ctf-alert already sends the detailed Telegram alerts, so on **Push monitors**
+untick the Telegram notification (they're for the dashboard). Keep Telegram on the **HTTP / Ping**
+monitors: those catch a dead server or site from outside. Result: every problem pings you once.
+
+| Problem | Who tells you |
+|---|---|
+| RAM / disk / firewall / container down / instances killed | ctf-alert (Telegram), also red in Kuma |
+| Server dead or unreachable | Kuma Ping monitor (Telegram) |
+| Site down from outside (DNS, HTTPS, Cloudflare) | Kuma HTTP monitor (Telegram) |
+
 ## 5. Status page for players (optional)
 
 Status Pages → New → name it after the event → add the site + server monitors → Save → share the link in the players' channel.
