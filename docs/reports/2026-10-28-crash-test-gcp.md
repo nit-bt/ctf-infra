@@ -35,6 +35,7 @@ Alerts: RAM alert, Kuma Down with the reason, Discord cards 🔴 with the reason
 3. **CPU saturates before RAM matters.** 30 × 0.5 CPU wanted on 4 vCPU = load 31. Real challenges idle most of the time.
 4. **Nuke All didn't work under overload.** It removed instances one by one (up to 10 s each) and the page showed nothing.
    → **Fixed** in plugin `a28ad1b`: removes all in parallel with an 8 s timeout, shows progress and "Removed N".
+     **Re-tested** with 30 stress instances and RAM at 98 %: progress shown, all removed, chal-1 back to green.
 5. **Fastest emergency cleanup is on the server itself:** `sudo docker rm -f $(sudo docker ps -q)`, then Nuke All in CTFd to clear the records.
 
 ## Event-day takeaways
