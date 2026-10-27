@@ -57,4 +57,4 @@ sudo /opt/ctf/ctf-infra/scripts/setup-users.sh harden-ssh
 
 Who did what: `sudo journalctl _COMM=sudo` · Remove someone: `setup-users.sh remove <user>`
 
-> GCP sandbox: OS Login manages users instead, see [01](01-gcp-sandbox.md#sudo-under-os-login).
+> GCP sandbox: Google manages users via the browser SSH button instead, see [01](01-gcp-sandbox.md#sudo-stops-working-after-a-few-minutes).
