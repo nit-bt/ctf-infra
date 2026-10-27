@@ -42,7 +42,7 @@ sudo systemctl restart docker
 sudo systemctl status docker --no-pager | head -5
 ```
 - Platform: then `cd /opt/ctf/CTFd && sudo docker compose up -d`
-- Challenge server: running player containers are gone. Players click **Stop** → **Start**. Check the firewall came back: `sudo ctf-docker-firewall status`
+- Challenge server: running player containers are gone. Players reopen the challenge and press **Start**. Check the firewall came back: `sudo ctf-docker-firewall status`
 
 ## 🔴 "RAM at …%"
 Challenge server:
@@ -64,7 +64,7 @@ sudo du -sh /opt/ctf/backups 2>/dev/null    # old backups? copy off, then delete
 ```
 
 ## 🟡 "container(s) killed for using too much RAM"
-Not urgent: that player's instance died, they **Stop → Start**.
+Not urgent: that player's instance died. When they reopen the challenge, the Start button is back (plugin `5aea38a`+), so they just press Start.
 Same challenge again and again → it needs more than 256 MB: raise the limit or hide it ([05](05-challenges.md)).
 
 ## 🔴 "Challenge firewall is OFF"
@@ -91,7 +91,7 @@ The other server is down or unreachable.
 ## Players say…
 | "…" | Do |
 |---|---|
-| "My instance doesn't load" | Stop → Start. Many people at once → is that host **UP** in Docker Config? |
+| "My instance doesn't load" | Close and reopen the challenge: a dead instance is detected and Start comes back. Otherwise Stop → Start. Many people at once → is that host **UP** in Docker Config? |
 | "Could not start container" | Host DOWN → section above. "Image not available" → repo not ticked in Docker Config |
 | "Please wait N seconds" / "still running" | Normal, wait and retry |
 | "Challenge X is broken" | Hide it, fix calmly, unhide, post a notice |

@@ -151,4 +151,5 @@ curl http://127.0.0.1:30500
 | Stop | any time; then 30 s before restarting that challenge |
 | Revert (fresh container) | after 5 min |
 | Auto-removed | when the challenge is solved, or after 2 h (checked at most once a minute while people use the site, and whenever an admin opens Docker Status) |
+| Instance died (out of RAM, crash) | Detected when the player reopens the challenge; Start comes back, no wait |
 | Admin | Docker Status page: see / kill any container, nuke all |

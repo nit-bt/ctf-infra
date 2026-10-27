@@ -35,6 +35,7 @@ Everything we actually hit, with the fix.
 | "Another container is already running…" | 1 at a time; stop the other one |
 | "Please wait N seconds…" | 30 s cooldown after Stop |
 | "Your previous request is still running…" | Player clicked twice, or a teammate clicked at the same time; wait a second and retry |
+| "Docker on … returned an error for …" | Docker on that challenge server is struggling (overloaded or restarting). Check it: `sudo systemctl status docker`, `free -h` |
 | "Start failed … port is already allocated" / "external connectivity" | 3 port clashes in a row; very unlikely with the reservation. Check nothing else on the chal server uses 30000-31000 |
 | "…reverted 5 minutes after creation" | Revert has a 5 min wait (Stop doesn't) |
 | "No free ports left" | Port range full: widen it (and the firewall rule) or add a server |
