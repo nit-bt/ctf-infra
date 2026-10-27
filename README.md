@@ -50,7 +50,7 @@ It also holds `setup-docker-tls.sh` and the `firewall/` scripts.
 | - | [docs/failover.md](docs/failover.md) | GCP spares: backups every 15 min, switch over if a Contabo server dies |
 | - | [docs/troubleshooting.md](docs/troubleshooting.md) | Every error we hit and the fix |
 | - | [docs/decisions.md](docs/decisions.md) | Why things are the way they are |
-| - | [docs/reports/](docs/reports/) | Test reports (load test 27 Oct: PASS) |
+| - | [docs/reports/](docs/reports/) | Test reports (load test 27 Oct: PASS, crash test 28 Oct: ~30 worst-case players per 8 GB server) |
 
 ## Scripts
 
