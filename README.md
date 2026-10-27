@@ -46,6 +46,7 @@ It also holds `setup-docker-tls.sh` and the `firewall/` scripts.
 | 7 | [docs/07-production-contabo.md](docs/07-production-contabo.md) | Moving to Contabo, domain, HTTPS, backups |
 | - | [docs/troubleshooting.md](docs/troubleshooting.md) | Every error we hit and the fix |
 | - | [docs/decisions.md](docs/decisions.md) | Why things are the way they are |
+| - | [docs/reports/](docs/reports/) | Test reports (load test 27 Oct: PASS) |
 
 ## Scripts
 
