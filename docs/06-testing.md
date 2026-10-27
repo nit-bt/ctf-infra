@@ -59,7 +59,7 @@ Goal: find where one challenge server breaks, and check the alerts catch it. Eac
 ~230 MB and burns its CPU share. On an 8 GB server about 30 fit; more than that should break it.
 
 **Setup (once)**
-1. Challenge server: `cd /opt/ctf/CTFd-Docker-Challenges && sudo git pull && cd tools/stress-image && sudo docker build -t ctf/stress .`
+1. Challenge server: `sudo git clone https://github.com/nit-bt/CTFd-Docker-Challenges.git /opt/ctf/CTFd-Docker-Challenges` (or `sudo git -C /opt/ctf/CTFd-Docker-Challenges pull`), then `cd /opt/ctf/CTFd-Docker-Challenges/tools/stress-image && sudo docker build -t ctf/stress .`
 2. CTFd → Admin → Docker Config → that host → tick `ctf/stress:latest` in the repositories → Update.
 3. Admin → Challenges → Create → type **docker**, name `STRESS`, image `ctf/stress:latest`, any flag, State **Hidden**. Note its ID.
 4. Open `#ctf-status`, `#ctf-alerts`, Kuma, and an SSH window on the challenge server running `watch -n2 free -h`.
@@ -79,4 +79,4 @@ how fast, whether the platform and other players' instances still work, and what
 **Recover**
 - Admin → Docker Status → **Nuke All**, or on the server `sudo docker rm -f $(sudo docker ps -q)`
 - Server not answering at all: GCP console → VM → **Reset**
-- Afterwards: delete the STRESS challenge, `python3 load-test.py --delete-users --players 45 --no-probe` or delete `loadtest-*` users by hand
+- Afterwards: delete the STRESS challenge, and Admin → Users → search `loadtest` → select all → delete
