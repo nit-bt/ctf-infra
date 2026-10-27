@@ -4,7 +4,7 @@
 #   ctf-alert run      check everything, notify on changes (systemd timer runs this every minute)
 #   ctf-alert status   check everything, print results, send nothing
 #   ctf-alert test     send a test message (and a push to Uptime Kuma if set)
-#   ctf-alert every N  check every N seconds (e.g. 15 on event day, 60 = back to normal)
+#   ctf-alert every N  check every N seconds (e.g. 20 on event day, 60 = back to normal)
 #
 # Optional Uptime Kuma (docs/monitoring.md): set KUMA_PUSH_URL to a Push monitor's URL and every
 # run reports there: up/down + what's wrong, and RAM % as the "ping" value (graphed by Kuma).
