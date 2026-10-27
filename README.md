@@ -46,6 +46,7 @@ It also holds `setup-docker-tls.sh` and the `firewall/` scripts.
 | 7 | [docs/07-production-contabo.md](docs/07-production-contabo.md) | Moving to Contabo, domain, HTTPS, backups |
 | - | [branding/](branding/) | Club look: logo, favicon, theme, home page |
 | - | [docs/emergency.md](docs/emergency.md) | **Event day:** alert → fix, fire drill |
+| - | [docs/monitoring.md](docs/monitoring.md) | Permanent dashboard (Uptime Kuma) watching every event from outside |
 | - | [docs/failover.md](docs/failover.md) | GCP spares: backups every 15 min, switch over if a Contabo server dies |
 | - | [docs/troubleshooting.md](docs/troubleshooting.md) | Every error we hit and the fix |
 | - | [docs/decisions.md](docs/decisions.md) | Why things are the way they are |
