@@ -4,6 +4,7 @@
 #   ctf-alert run      check everything, notify on changes (systemd timer runs this every minute)
 #   ctf-alert status   check everything, print results, send nothing
 #   ctf-alert test     send a test message (and a push to Uptime Kuma if set)
+#   ctf-alert every N  check every N seconds (e.g. 15 on event day, 60 = back to normal)
 #
 # Optional Uptime Kuma (docs/monitoring.md): set KUMA_PUSH_URL to a Push monitor's URL and every
 # run reports there: up/down + what's wrong, and RAM % as the "ping" value (graphed by Kuma).
@@ -230,6 +231,20 @@ case "${1:-}" in
         fi
         echo "$now" > "$STATE_DIR/.last_run"
         ;;
+    every)
+        sec=${2:-}
+        [[ $sec =~ ^[0-9]+$ ]] && (( sec >= 10 )) || { echo "Usage: sudo ctf-alert every <seconds, 10 or more>   (60 = normal)"; exit 1; }
+        d=/etc/systemd/system/ctf-alert.timer.d
+        if (( sec == 60 )); then
+            rm -f "$d/every.conf"
+        else
+            mkdir -p "$d"
+            printf '[Timer]\nOnUnitActiveSec=%ss\nAccuracySec=1s\n' "$sec" > "$d/every.conf"
+        fi
+        systemctl daemon-reload && systemctl restart ctf-alert.timer
+        echo "Checking every ${sec}s now."
+        (( sec < 60 )) && echo "Kuma: set this server's Push monitor Heartbeat Interval to about $(( sec * 2 < 30 ? 30 : sec * 2 ))s to match."
+        ;;
     *)
-        sed -n '2,12p' "$0"; exit 1 ;;
+        sed -n '2,20p' "$0"; exit 1 ;;
 esac

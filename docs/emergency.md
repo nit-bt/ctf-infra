@@ -26,6 +26,8 @@ You get 🔴 once, a reminder every 15 min while it stays broken, ✅ when it's 
 
 **Dashboard:** with Uptime Kuma set up ([monitoring.md](monitoring.md)), add `KUMA_PUSH_URL` to the same config and every check shows up there too.
 
+**Event day:** check more often, on every server: `sudo ctf-alert every 15` (and set each Push monitor in Kuma to Heartbeat Interval 30). After the event: `sudo ctf-alert every 60` (Kuma back to 90).
+
 **Before the event:** install an SSH app on your phone (Termius, JuiceSSH) with your key, and save logins for every server. Do the [fire drill](#fire-drill) once.
 
 ## 🔴 "CTFd site not answering" / "CTFd container '…' is not running"
