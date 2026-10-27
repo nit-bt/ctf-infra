@@ -19,7 +19,7 @@ patch_cfg() {  # reads JSON from stdin
 
 echo "uploading images..."
 LOGO=$(upload ctfc-logo.png)
-BADGE=$(upload ctfc-badge.png)
+BADGE=$(upload ctfc-logo.png)   # navbar: full logo
 ICON=$(upload favicon.ico)
 
 echo "theme, logo, favicon..."

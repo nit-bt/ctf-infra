@@ -6,7 +6,7 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Tiny5&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Press+Start+2P&family=Tiny5&display=swap" rel="stylesheet">
 <style>
 /* ---------- tokens (all taken from the club logo) ---------- */
 :root, [data-bs-theme="dark"] {
@@ -25,6 +25,7 @@
   --ctfc-muted: #b4aac0;
   --ctfc-px: 4px;             /* one "pixel" of the stepped corners */
   --ctfc-pixel: "Tiny5", "Atkinson Hyperlegible", system-ui, sans-serif;
+  --ctfc-arcade: "Press Start 2P", "Tiny5", system-ui, sans-serif;   /* big page titles only */
   --ctfc-text: "Atkinson Hyperlegible", system-ui, sans-serif;
 
   --bs-body-bg: var(--ctfc-night);
@@ -68,12 +69,12 @@ a { text-underline-offset: 3px; }
 .navbar .nav-link, .navbar .dropdown-item { font-family: var(--ctfc-pixel); font-weight: 400; color: var(--ctfc-muted); }
 .navbar .nav-link:hover, .navbar .nav-link:focus-visible { color: var(--ctfc-cream); }
 .navbar-brand { font-family: var(--ctfc-pixel); font-weight: 400; color: var(--ctfc-cream) !important; }
-.navbar-brand img.ctf_logo { height: 40px; width: auto; image-rendering: auto; }
+.navbar-brand img.ctf_logo { height: 52px; width: auto; image-rendering: auto; }
 .theme-switch { display: none !important; }        /* dark only */
 
 /* ---------- page titles ---------- */
 .jumbotron { background: transparent; color: var(--ctfc-cream); text-align: left; padding: 3.5rem 0 0; margin-bottom: 0; }
-.jumbotron h1 { font-size: clamp(2rem, 4vw, 2.75rem); margin: 0; }
+.jumbotron h1 { font-family: var(--ctfc-arcade); font-size: clamp(1.4rem, 3vw, 2rem); line-height: 1.35; margin: 0; }
 .jumbotron h1::after {     /* a little stepped ribbon bar under the title */
   content: ""; display: block; width: 7.5rem; height: 8px; margin-top: .75rem;
   background:
@@ -178,7 +179,7 @@ form .form-label, form label { color: var(--ctfc-cream); }
 /* ---------- home page (Admin > Pages > index) ---------- */
 .ctfc-hero { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(1.5rem, 4vw, 3.5rem); align-items: center; padding: clamp(2rem, 6vw, 4.5rem) 0 2.5rem; }
 .ctfc-hero img { width: 100%; height: auto; display: block; filter: drop-shadow(0 6px 0 #0d0912); }
-.ctfc-hero h1 { font-size: clamp(2.2rem, 5vw, 3.4rem); line-height: 1.05; margin: 0 0 1rem; }
+.ctfc-hero h1 { font-family: var(--ctfc-arcade); font-size: clamp(1.4rem, 3vw, 2.2rem); line-height: 1.35; margin: 0 0 1.25rem; }
 .ctfc-hero p { font-size: 1.2rem; color: var(--ctfc-cream-dk); max-width: 34ch; margin: 0 0 1.5rem; }
 .ctfc-cta { display: inline-block; font-family: var(--ctfc-pixel); font-weight: 400; font-size: 1.15rem; text-decoration: none;
   background: var(--ctfc-red); color: var(--ctfc-cream) !important; padding: .8rem 1.4rem; box-shadow: inset 0 -4px 0 var(--ctfc-red-dk); }

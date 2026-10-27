@@ -8,7 +8,8 @@ Club look for the platform, built from the club logo. Everything is applied from
 
 | File | Goes to |
 |---|---|
-| `ctfc-badge.png` | Admin > Config > Logo (navbar) |
+| `ctfc-logo.png` | Admin > Config > Logo (navbar) and the home page |
+| `ctfc-badge.png` | spare: flags-only crop |
 | `favicon.ico` | Admin > Config > Logo > Small Icon (browser tab) |
 | `ctfc-logo.png` | uploaded as a file, used on the home page |
 | `theme-header.html` | Admin > Config > Theme > Theme Header |
@@ -23,7 +24,8 @@ Club look for the platform, built from the club logo. Everything is applied from
   - **Red** means not solved yet; **blue** means captured, like the two flags.
   - Cream challenge cards, the same cream as the logo sticker.
 - **Fonts:**
-  - Tiny5 (pixel) for titles, buttons and points.
+  - Press Start 2P (chunky arcade) for big page titles.
+  - Tiny5 (pixel) for the navbar, buttons and points.
   - Atkinson Hyperlegible for body text and the flag input, so `0/O` and `1/l` are easy to tell apart.
 - **Shapes:** stepped pixel corners and hard pixel shadows, matching the pixel-art logo.
 - **Dark mode only:** the light/dark switch is hidden.
@@ -32,7 +34,7 @@ Club look for the platform, built from the club logo. Everything is applied from
 
 1. **Theme.** Admin > Config > Theme: set the theme to **core-beta** (the default in 3.7) and Save.
 2. **Logo and favicon.** Admin > Config > Logo:
-   - Logo: upload `ctfc-badge.png`.
+   - Logo: upload `ctfc-logo.png`.
    - Small Icon: upload `favicon.ico`.
    - Save.
 3. **Theme header.** Admin > Config > Theme > Theme Header: paste all of `theme-header.html` and Save.
