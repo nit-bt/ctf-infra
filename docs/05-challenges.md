@@ -150,7 +150,7 @@ curl http://127.0.0.1:30500
 | Containers at once | 1 per player (Teams mode: 1 per team) |
 | Stop | any time; then a cooldown before restarting that challenge (default 30 s) |
 | Revert (fresh container) | after 5 min (default) |
-| Auto-removed | when the challenge is solved, or when its lifetime ends (default 2 h; players see "Instance removed in …"). Checked at most once a minute while people use the site, and whenever an admin opens Docker Status |
+| Auto-removed | when the challenge is solved, or when its lifetime ends (default 2 h; only admins see the expiry, in Docker Status). Checked at most once a minute while people use the site, and whenever an admin opens Docker Status |
 
 All three times are set per server in **Docker Config** (Instance lifetime / Revert after / Cooldown after Stop). A challenge that takes long to solve → raise the lifetime on its server, or 0 for no limit (then only solve, Stop or Nuke removes it).
 | Instance died (out of RAM, crash) | Detected when the player reopens the challenge; Start comes back, no wait |
