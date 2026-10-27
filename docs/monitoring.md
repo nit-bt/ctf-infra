@@ -38,10 +38,10 @@ echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 
 sudo apt update && sudo apt install -y docker.io
 sudo docker run -d --name uptime-kuma --restart=always \
-  -p 3001:3001 -v uptime-kuma:/app/data louislam/uptime-kuma:1
+  -p 3001:3001 -v uptime-kuma:/app/data louislam/uptime-kuma:2
 ```
 
-Open `http://<monitor-ip>:3001` → create the admin account (strong password) → **Settings → Security → enable 2FA**.
+Open `http://<monitor-ip>:3001` → database: **SQLite** (embedded MariaDB needs more RAM than an e2-micro has) → create the admin account (strong password) → **Settings → Security → enable 2FA**.
 It's on the internet; the login + 2FA is what protects it. Later, with a domain, put it behind HTTPS (e.g. `status.<domain>` via Cloudflare).
 
 ## 3. Telegram (once)
@@ -93,7 +93,7 @@ Players check it before messaging "site down??".
 ## Updating
 
 ```bash
-sudo docker pull louislam/uptime-kuma:1 && sudo docker rm -f uptime-kuma
-sudo docker run -d --name uptime-kuma --restart=always -p 3001:3001 -v uptime-kuma:/app/data louislam/uptime-kuma:1
+sudo docker pull louislam/uptime-kuma:2 && sudo docker rm -f uptime-kuma
+sudo docker run -d --name uptime-kuma --restart=always -p 3001:3001 -v uptime-kuma:/app/data louislam/uptime-kuma:2
 ```
 Data stays in the `uptime-kuma` volume.
