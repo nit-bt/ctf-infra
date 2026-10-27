@@ -202,11 +202,11 @@ form .form-label, form label { color: var(--ctfc-cream); }
 }
 @media (prefers-reduced-motion: reduce) { .challenge-button { transition: none; } .challenge-button:hover { transform: none; } }
 /* ---------- "Flag captured!" popup (shown with the confetti) ---------- */
-.ctfc-win { position: fixed; inset: 0; z-index: 9999; display: grid; place-items: center; background: rgba(13, 9, 18, .55); }
+.ctfc-win { position: fixed; inset: 0; z-index: 9999; display: grid; place-items: center; background: rgba(13, 9, 18, .55); contain: strict; }
 .ctfc-win-box { --s: var(--ctfc-px); background: var(--ctfc-blue); color: var(--ctfc-cream); text-align: center;
-  padding: 2rem 2.5rem 1.5rem; min-width: min(22rem, 90vw); filter: drop-shadow(0 6px 0 #0d0912);
+  padding: 2rem 2.5rem 1.5rem; min-width: min(22rem, 90vw);
   clip-path: polygon(0 var(--s),var(--s) var(--s),var(--s) 0,calc(100% - var(--s)) 0,calc(100% - var(--s)) var(--s),100% var(--s),100% calc(100% - var(--s)),calc(100% - var(--s)) calc(100% - var(--s)),calc(100% - var(--s)) 100%,var(--s) 100%,var(--s) calc(100% - var(--s)),0 calc(100% - var(--s)));
-  animation: ctfc-pop .35s steps(4) both; }
+  animation: ctfc-pop .16s steps(3) both; }
 .ctfc-win-title { font-family: var(--ctfc-arcade); font-size: clamp(1.1rem, 3.5vw, 1.6rem); line-height: 1.4; margin-bottom: 1rem; }
 .ctfc-win-meme { display: block; max-width: min(320px, 75vw); max-height: 240px; margin: 0 auto 1rem; image-rendering: auto; }
 .ctfc-win-name { font-size: 1.15rem; font-weight: 700; }
@@ -221,32 +221,48 @@ form .form-label, form label { color: var(--ctfc-cream); }
   var COLORS = ["#b5532e", "#3a6fd8", "#f4f5ed", "#8f3d7b", "#e07a4f", "#6f9cf0"];
   function burst() {
     if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    var c = document.createElement("canvas"), x = c.getContext("2d"), dpr = window.devicePixelRatio || 1;
+    var c = document.createElement("canvas"), x = c.getContext("2d", { alpha: true });
     var W = innerWidth, H = innerHeight;
-    c.width = W * dpr; c.height = H * dpr;
+    c.width = W; c.height = H;
     c.style.cssText = "position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:10000";
-    document.body.appendChild(c); x.scale(dpr, dpr);
+    document.body.appendChild(c);
     var bits = [];
     [[0, H, 1], [W, H, -1]].forEach(function (o) {           // two cannons, bottom corners
-      for (var i = 0; i < 90; i++) {
-        var a = (55 + Math.random() * 30) * Math.PI / 180, v = 11 + Math.random() * 9;
+      for (var i = 0; i < 60; i++) {
+        var a = (55 + Math.random() * 30) * Math.PI / 180, v = 22 + Math.random() * 14;
         bits.push({ x: o[0], y: o[1], vx: Math.cos(a) * v * o[2], vy: -Math.sin(a) * v,
           s: 4 * (1 + (Math.random() * 3 | 0)), c: COLORS[Math.random() * COLORS.length | 0],
           f: Math.random() * 6 });
       }
     });
-    var t0 = performance.now();
+    var t0 = performance.now(), last = t0, END = 1500, FADE = 400;
     (function frame(t) {
-      var age = t - t0; x.clearRect(0, 0, W, H);
-      bits.forEach(function (b) {
-        b.vy += 0.32; b.vx *= 0.985; b.vy *= 0.985; b.x += b.vx; b.y += b.vy; b.f += 0.25;
-        var w = Math.max(2, Math.round(Math.abs(Math.cos(b.f)) * b.s / 2) * 2);   // flip, in whole pixels
-        x.globalAlpha = age > 2200 ? Math.max(0, 1 - (age - 2200) / 600) : 1;
+      var age = t - t0, dt = Math.min(3, (t - last) / 16.67); last = t;   // time-based: same speed at any frame rate
+      x.clearRect(0, 0, W, H);
+      x.globalAlpha = age > END - FADE ? Math.max(0, (END - age) / FADE) : 1;
+      for (var i = 0; i < bits.length; i++) {
+        var b = bits[i], k = Math.pow(0.97, dt);
+        b.vy += 0.9 * dt; b.vx *= k; b.vy *= k; b.x += b.vx * dt; b.y += b.vy * dt; b.f += 0.4 * dt;
+        var w = Math.max(2, Math.round(Math.abs(Math.cos(b.f)) * b.s / 2) * 2);
         x.fillStyle = b.c; x.fillRect(Math.round(b.x), Math.round(b.y), w, b.s);
-      });
-      if (age < 2800) requestAnimationFrame(frame); else c.remove();
+      }
+      if (age < END) requestAnimationFrame(frame); else c.remove();
     })(t0);
   }
+  var memeList = null;
+  function memes() {
+    if (!memeList) memeList = fetch("/api/v1/docker_memes", { credentials: "same-origin", headers: { "Content-Type": "application/json" } })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) {
+        var list = (j && j.data && j.data.solved_list) || [];
+        list.forEach(function (u) { new Image().src = u; });   // preload so the popup doesn't wait
+        return list;
+      }).catch(function () { return []; });
+    return memeList;
+  }
+  document.addEventListener("click", function (e) {           // warm up when a challenge is opened
+    if (e.target.closest && e.target.closest(".challenge-button")) memes();
+  }, true);
   function popup() {
     var win = document.querySelector("#challenge-window");
     var name = win && win.querySelector(".challenge-name"), pts = win && win.querySelector(".challenge-value");
@@ -255,10 +271,7 @@ form .form-label, form label { color: var(--ctfc-cream); }
     d.innerHTML = '<div class="ctfc-win-box"><div class="ctfc-win-title">Flag captured!</div>' +
       '<div class="ctfc-win-name"></div><div class="ctfc-win-pts"></div>' +
       '<button type="button" class="btn ctfc-win-ok">Nice</button></div>';
-    fetch("/api/v1/docker_memes", { credentials: "same-origin", headers: { "Content-Type": "application/json" } })
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (j) {
-        var list = (j && j.data && j.data.solved_list) || [];
+    memes().then(function (list) {
         if (!list.length || !d.isConnected) return;
         var img = new Image(); img.alt = ""; img.className = "ctfc-win-meme";
         img.onerror = function () { img.remove(); };
