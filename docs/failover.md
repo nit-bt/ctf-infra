@@ -22,7 +22,9 @@ Addresses first: a failover is only quick if nothing has to be looked up or re-t
    - `ctf.<domain>` → Contabo platform, **proxied** 🟠: switching it to GCP takes effect in seconds, no TTL wait.
    - `chal1.<domain>` → Contabo challenge server, DNS only, **TTL 1 min**.
    - Put the **same Cloudflare origin certificate** on both platforms' nginx, so HTTPS works on GCP the moment DNS points there.
-3. **Spare platform ready:** CTFd installed exactly like Contabo (docs/03: same CTFd version, same plugin, `docker-compose.yml`). Theme doesn't matter, the restore brings it.
+3. **Spare platform ready:** CTFd installed exactly like Contabo (docs/03 + 07: same CTFd version, same plugin, same `docker-compose.yml`). Theme doesn't matter, the restore brings it.
+   - Copy Contabo's `/opt/ctf/CTFd/.env` to the spare **before its first `docker compose up`**. Same `SECRET_KEY` = players stay logged in after a switch; same DB passwords = the restored `.env` matches the spare's database.
+   - Already started the spare with other passwords? `sudo docker compose down -v` (wipes the spare's empty DB), copy `.env`, `up -d` again.
 4. **Backups flow to the spare:**
    ```bash
    # on the CONTABO platform

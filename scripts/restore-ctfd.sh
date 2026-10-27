@@ -33,11 +33,15 @@ docker compose exec -T db sh -c 'mariadb -uroot -p"$MARIADB_ROOT_PASSWORD"' < "$
 echo "[3/4] Uploads + secret key"
 if [[ -d $TMP/uploads ]]; then mkdir -p .data/CTFd/uploads && cp -a "$TMP/uploads/." .data/CTFd/uploads/; fi
 [[ -f $TMP/.ctfd_secret_key ]] && cp -a "$TMP/.ctfd_secret_key" .
+if [[ -f $TMP/.env ]]; then   # same SECRET_KEY = players stay logged in, same DB passwords as the dump
+  [[ -f .env ]] && cp -a .env ".env.before-restore"
+  cp -a "$TMP/.env" .
+fi
 
 docker compose exec -T cache redis-cli FLUSHALL >/dev/null 2>&1 || true   # old cached config/sessions
 
 echo "[4/4] Start CTFd"
-docker compose up -d ctfd
+docker compose up -d --force-recreate ctfd
 up() { docker compose exec -T ctfd python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/', timeout=5)" >/dev/null 2>&1; }
 for i in $(seq 30); do up && break; sleep 2; done
 up && echo "Restored. CTFd is up." || { echo "CTFd not answering yet: sudo docker compose logs --tail 50 ctfd"; exit 1; }

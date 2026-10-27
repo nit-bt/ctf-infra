@@ -36,6 +36,7 @@ docker compose exec -T db sh -c \
 echo "[2/3] Uploads + secret key + config"
 [[ -d .data/CTFd/uploads ]] && cp -a .data/CTFd/uploads "$TMP/uploads"
 [[ -f .ctfd_secret_key ]] && cp -a .ctfd_secret_key "$TMP/"
+[[ -f .env ]] && cp -a .env "$TMP/"            # SECRET_KEY + DB passwords on Contabo (docs/07)
 cp -a docker-compose.yml "$TMP/"
 
 echo "[3/3] Archive"
