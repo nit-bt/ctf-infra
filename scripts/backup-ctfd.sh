@@ -15,7 +15,7 @@ set -euo pipefail
 CTFD_DIR=${1:-/opt/ctf/CTFd}
 OUT_DIR=${2:-/opt/ctf/backups}
 KEEP=14
-OFFSITE=""                      # e.g. ctfbackup@34.1.2.3:   (set in /etc/default/ctfd-backup)
+OFFSITE=""                      # e.g. ctfbackup@<spare-ip>:   (set in /etc/default/ctfd-backup)
 OFFSITE_KEY=/root/.ssh/ctfd-backup
 [[ -f /etc/default/ctfd-backup ]] && . /etc/default/ctfd-backup
 

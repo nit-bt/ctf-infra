@@ -32,8 +32,8 @@ TG_CHAT_ID=
 DISCORD_WEBHOOK=
 
 # --- other servers to watch (name=ip:port, space separated) ---
-# platform: each challenge server's Docker API, e.g.  "chal-1=10.148.0.4:2376 chal-2=10.148.0.5:2376"
-# chal:     the platform's web port,               e.g.  "platform=10.148.0.3:80"
+# platform: each challenge server's Docker API, e.g.  "chal-1=<chal-1-ip>:2376 chal-2=<chal-2-ip>:2376"
+# chal:     the platform's web port,               e.g.  "platform=<platform-ip>:80"
 PEERS=""
 
 SITE_URL=http://localhost

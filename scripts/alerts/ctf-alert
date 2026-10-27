@@ -20,7 +20,7 @@ TG_BOT_TOKEN=${TG_BOT_TOKEN:-}
 TG_CHAT_ID=${TG_CHAT_ID:-}
 DISCORD_WEBHOOK=${DISCORD_WEBHOOK:-}
 SITE_URL=${SITE_URL:-http://localhost}
-PEERS=${PEERS:-}                   # "chal-1=10.148.0.4:2376 chal-2=10.148.0.5:2376"
+PEERS=${PEERS:-}                   # "chal-1=<chal-1-ip>:2376 chal-2=<chal-2-ip>:2376"
 RAM_WARN=${RAM_WARN:-85}           # % used
 DISK_WARN=${DISK_WARN:-85}         # % used
 REMIND_MIN=${REMIND_MIN:-15}
