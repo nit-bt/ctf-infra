@@ -55,24 +55,23 @@ VPC network → Firewall → Create firewall rule (Logs **off**, Ingress, Allow)
 
 Firewall rules match **tags**, so they can be created before the VM exists.
 
-## sudo under OS Login
+## sudo stops working after a few minutes
 
-The org enforces **OS Login**: your SSH user exists, but `sudo` says
-`sudo: I'm sorry <user>. I'm afraid I can't do that`.
+Symptom: `sudo` works, then a few minutes later: `sudo: I'm sorry <user>. I'm afraid I can't do that`.
 
-Proper fix: IAM (project scope) → Grant access → your email → role **Compute OS Admin Login** → close SSH tab, wait 1 min, reopen.
-
-If that still doesn't give sudo (it didn't fully for us), sandbox workaround:
-VM → **Edit** → **Automation → Startup script** (not the Metadata key box):
-
-```bash
-#!/bin/bash
-echo '<your-ssh-user> ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/90-<your-ssh-user>
-chmod 440 /etc/sudoers.d/90-<your-ssh-user>
+Cause (from `/var/log/auth.log` and `journalctl -u google-guest-agent`): the browser **SSH** button adds a **temporary SSH key that expires after ~3 minutes**. While a valid key exists, Google's guest agent puts you in the `google-sudoers` group (that's where sudo comes from). When the key expires it removes you from the group, so sudo stops even though the SSH window stays open:
 ```
-Save → **Reset** the VM → `sudo whoami` → `root`.
+google_guest_agent: Adding existing user <user> to google-sudoers group
+google_guest_agent: invalid ssh key entry - expired key ...
+google_guest_agent: Removing user <user>
+gpasswd: user <user> removed by root from group google-sudoers
+```
 
-> Sandbox only. On Contabo use `scripts/setup-users.sh`.
+Options:
+- **Quick (what we do in the sandbox):** close the SSH tab and open a new one when sudo stops; run sudo commands right after connecting.
+- **Permanent:** add your own SSH key (comment = your username) under Compute Engine → **Metadata → SSH keys**, then `ssh <user>@<ip>` from your laptop. The key never expires, so you stay in `google-sudoers`.
+
+(We first thought this was OS Login and tried an IAM role and a sudoers startup script. Neither was the cause. The startup script can be removed.)
 
 ## Challenge VM: no service account
 

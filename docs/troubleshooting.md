@@ -8,7 +8,7 @@ Everything we actually hit, with the fix.
 |---|---|---|
 | VM has no External IP; dropdown only shows *None*; "External IPs for VM instances organisation policy does not allow…" | Org policy `compute.vmExternalIpAccess` | Org policies → Allow all ([01](01-gcp-sandbox.md#org-policies-one-time)) |
 | "IAM policy update failed … Domain-restricted sharing" | Org policy `iam.allowedPolicyMemberDomains` | Org policies → Allow all |
-| `sudo: I'm sorry <user>. I'm afraid I can't do that` | OS Login without admin role | Grant **Compute OS Admin Login**; if still failing, startup-script sudoers ([01](01-gcp-sandbox.md#sudo-under-os-login)) |
+| `sudo: I'm sorry <user>. I'm afraid I can't do that` (a few minutes after connecting) | Browser SSH key expired, guest agent removed you from `google-sudoers` | Open a new SSH tab; permanent fix: own SSH key in Metadata ([01](01-gcp-sandbox.md#sudo-stops-working-after-a-few-minutes)) |
 | "To add a startup script, use the 'Startup script' section" | Put it in Metadata as `startup-script` | Use **Automation → Startup script** box instead |
 | Can't change service account | VM running | Stop the VM first |
 | "Some features are restricted … data sovereignty" banner | Org policies | Info only; check *Details* if an option you need is greyed |
