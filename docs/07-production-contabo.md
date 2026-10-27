@@ -68,7 +68,7 @@ scp <user>@<platform>:/opt/ctf/backups/ctfd-*.tar.gz .
 ```
 Daily cron (see script header). Before cancelling a server: final backup, copy it off, check it opens.
 
-**On event day** back up every hour (9:00-17:00) instead of daily, and copy the latest one off at lunch and at the end:
+**On event day** back up every 15 min, pushed to the GCP spare automatically: see [failover.md](failover.md). Without the spare, at least hourly, and copy the latest one off at lunch and at the end:
 ```bash
 sudo crontab -e
 # add:
@@ -76,6 +76,8 @@ sudo crontab -e
 ```
 
 ### Restore
+
+Easiest: `sudo ./scripts/restore-ctfd.sh [file]` (newest backup if no file given). By hand:
 
 ```bash
 mkdir -p /tmp/restore && sudo tar xzf ctfd-YYYYMMDD-HHMM.tar.gz -C /tmp/restore

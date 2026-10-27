@@ -46,6 +46,7 @@ It also holds `setup-docker-tls.sh` and the `firewall/` scripts.
 | 7 | [docs/07-production-contabo.md](docs/07-production-contabo.md) | Moving to Contabo, domain, HTTPS, backups |
 | - | [branding/](branding/) | Club look: logo, favicon, theme, home page |
 | - | [docs/emergency.md](docs/emergency.md) | **Event day:** alert → fix, fire drill |
+| - | [docs/failover.md](docs/failover.md) | GCP spares: backups every 15 min, switch over if a Contabo server dies |
 | - | [docs/troubleshooting.md](docs/troubleshooting.md) | Every error we hit and the fix |
 | - | [docs/decisions.md](docs/decisions.md) | Why things are the way they are |
 | - | [docs/reports/](docs/reports/) | Test reports (load test 27 Oct: PASS) |
@@ -56,7 +57,9 @@ It also holds `setup-docker-tls.sh` and the `firewall/` scripts.
 |---|---|---|
 | `scripts/install-docker.sh` | every server | Docker CE from Docker's official repo |
 | `scripts/setup-users.sh` | every server | team users, SSH keys, sudo, `/opt/ctf`, SSH hardening |
-| `scripts/backup-ctfd.sh` | platform | DB dump + uploads → `.tar.gz` |
+| `scripts/backup-ctfd.sh` | platform | DB dump + uploads → `.tar.gz`, pushed to the GCP spare |
+| `scripts/restore-ctfd.sh` | platform / spare | load a backup into CTFd |
+| `scripts/setup-backup-receiver.sh` | GCP spare platform | user that can only receive backups |
 | `scripts/alerts/` | every server | phone alerts (Telegram/Discord) when something breaks, see [emergency](docs/emergency.md) |
 | plugin repo: `setup-docker-tls.sh` | challenge servers | Docker API on :2376 with TLS + client certs |
 | plugin repo: `firewall/harden-chal-host.sh` | challenge servers | block container egress, lock :2376 to the platform |

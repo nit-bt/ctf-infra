@@ -88,6 +88,9 @@ The other server is down or unreachable.
 3. GCP: an ephemeral IP changes on stop/start → update *Public address* in Docker Config
 4. After a challenge server comes back: CTFd → Docker Config → host **UP**?
 
+## 🔴 A whole Contabo server is dead (reboot didn't help)
+Switch to the GCP spare: [failover.md](failover.md) scenario **B** (challenge server) or **C** (platform).
+
 ## Players say…
 | "…" | Do |
 |---|---|
