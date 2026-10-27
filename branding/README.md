@@ -52,6 +52,14 @@ Club look for the platform, built from the club logo. Everything is applied from
 
    If the cards look default, the Theme Header didn't save, or the theme isn't core-beta.
 
+### Or with one script
+
+`apply.sh` does steps 1 to 5. Edit the date in `index-page.html` first, because running it again overwrites the home page.
+
+```bash
+URL=http://localhost:8000 TOKEN=ctfd_xxx ./apply.sh
+```
+
 ### Same thing from the command line
 
 Useful when rebuilding. You need an admin API token (Settings > Access Tokens).
