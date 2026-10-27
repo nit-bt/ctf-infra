@@ -24,7 +24,8 @@ Club look for the platform, built from the club logo. Everything is applied from
   - Cream challenge cards, the same cream as the logo sticker.
 - **Fonts:**
   - Press Start 2P (chunky arcade) for big page titles.
-  - Tiny5 (pixel) for the navbar, buttons and points.
+  - Jersey 10 (rounder pixel) for the top bar.
+  - Tiny5 (pixel) for buttons, section titles and points.
   - Atkinson Hyperlegible for body text and the flag input, so `0/O` and `1/l` are easy to tell apart.
 - **Shapes:** stepped pixel corners and hard pixel shadows, matching the pixel-art logo.
 - **Dark mode only:** the light/dark switch is hidden.

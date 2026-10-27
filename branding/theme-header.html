@@ -6,7 +6,7 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Press+Start+2P&family=Tiny5&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Jersey+10&family=Press+Start+2P&family=Tiny5&display=swap" rel="stylesheet">
 <style>
 /* ---------- tokens (all taken from the club logo) ---------- */
 :root, [data-bs-theme="dark"] {
@@ -25,6 +25,7 @@
   --ctfc-muted: #b4aac0;
   --ctfc-px: 4px;             /* one "pixel" of the stepped corners */
   --ctfc-pixel: "Tiny5", "Atkinson Hyperlegible", system-ui, sans-serif;
+  --ctfc-nav: "Jersey 10", "Tiny5", system-ui, sans-serif;           /* top bar */
   --ctfc-arcade: "Press Start 2P", "Tiny5", system-ui, sans-serif;   /* big page titles only */
   --ctfc-text: "Atkinson Hyperlegible", system-ui, sans-serif;
 
@@ -66,7 +67,7 @@ a { text-underline-offset: 3px; }
 
 /* ---------- navbar: quiet, with a ribbon-coloured edge ---------- */
 .navbar.bg-dark { background: var(--ctfc-night-2) !important; border-bottom: var(--ctfc-px) solid var(--ctfc-plum); }
-.navbar .nav-link, .navbar .dropdown-item { font-family: var(--ctfc-pixel); font-weight: 400; color: var(--ctfc-muted); }
+.navbar .nav-link, .navbar .dropdown-item { font-family: var(--ctfc-nav); font-weight: 400; font-size: 1.35rem; letter-spacing: .02em; line-height: 1.2; color: var(--ctfc-muted); }
 .navbar .nav-link:hover, .navbar .nav-link:focus-visible { color: var(--ctfc-cream); }
 .navbar-brand { font-family: var(--ctfc-pixel); font-weight: 400; color: var(--ctfc-cream) !important; }
 .navbar-brand img.ctf_logo { height: 52px; width: auto; image-rendering: auto; }
