@@ -44,6 +44,7 @@ It also holds `setup-docker-tls.sh` and the `firewall/` scripts.
 | 5 | [docs/05-challenges.md](docs/05-challenges.md) | Building and adding instanced challenges |
 | 6 | [docs/06-testing.md](docs/06-testing.md) | End-to-end checklist |
 | 7 | [docs/07-production-contabo.md](docs/07-production-contabo.md) | Moving to Contabo, domain, HTTPS, backups |
+| - | [docs/emergency.md](docs/emergency.md) | **Event day:** alert → fix, fire drill |
 | - | [docs/troubleshooting.md](docs/troubleshooting.md) | Every error we hit and the fix |
 | - | [docs/decisions.md](docs/decisions.md) | Why things are the way they are |
 | - | [docs/reports/](docs/reports/) | Test reports (load test 27 Oct: PASS) |
@@ -55,6 +56,7 @@ It also holds `setup-docker-tls.sh` and the `firewall/` scripts.
 | `scripts/install-docker.sh` | every server | Docker CE from Docker's official repo |
 | `scripts/setup-users.sh` | every server | team users, SSH keys, sudo, `/opt/ctf`, SSH hardening |
 | `scripts/backup-ctfd.sh` | platform | DB dump + uploads → `.tar.gz` |
+| `scripts/alerts/` | every server | phone alerts (Telegram/Discord) when something breaks, see [emergency](docs/emergency.md) |
 | plugin repo: `setup-docker-tls.sh` | challenge servers | Docker API on :2376 with TLS + client certs |
 | plugin repo: `firewall/harden-chal-host.sh` | challenge servers | block container egress, lock :2376 to the platform |
 
