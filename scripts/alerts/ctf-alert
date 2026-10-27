@@ -1,0 +1,173 @@
+#!/usr/bin/env bash
+# CTF server alerts -> Telegram and/or Discord.
+#
+#   ctf-alert run      check everything, notify on changes (systemd timer runs this every minute)
+#   ctf-alert status   check everything, print results, send nothing
+#   ctf-alert test     send a test message
+#
+# Sends:  🔴 when something breaks, a reminder every REMIND_MIN while it stays broken,
+#         ✅ when it recovers, 🟡 when a container got killed for using too much RAM.
+#
+# Config: /etc/default/ctf-alert  (or CTF_ALERT_CONF)
+set -uo pipefail
+
+CONF=${CTF_ALERT_CONF:-/etc/default/ctf-alert}
+[[ -f $CONF ]] && . "$CONF"
+
+ROLE=${ROLE:-chal}                 # platform | chal
+NAME=${NAME:-$(hostname)}
+TG_BOT_TOKEN=${TG_BOT_TOKEN:-}
+TG_CHAT_ID=${TG_CHAT_ID:-}
+DISCORD_WEBHOOK=${DISCORD_WEBHOOK:-}
+SITE_URL=${SITE_URL:-http://localhost}
+PEERS=${PEERS:-}                   # "chal-1=10.148.0.4:2376 chal-2=10.148.0.5:2376"
+RAM_WARN=${RAM_WARN:-85}           # % used
+DISK_WARN=${DISK_WARN:-85}         # % used
+REMIND_MIN=${REMIND_MIN:-15}
+STATE_DIR=${STATE_DIR:-/var/lib/ctf-alert}
+TLS_DIR=${TLS_DIR:-/etc/docker/tls}
+API_PORT=${API_PORT:-2376}
+TG_API=${TG_API:-https://api.telegram.org}
+
+now=$(date +%s)
+declare -A FAIL=()   # key -> message
+INFO=()              # one-off messages
+
+fail() { FAIL[$1]=$2; }
+
+# ---------------------------------------------------------------- checks
+check_common() {
+    if ! systemctl is-active --quiet docker; then
+        fail docker "Docker is not running"
+    fi
+
+    local total avail used
+    total=$(awk '/^MemTotal:/ {print $2}' /proc/meminfo)
+    avail=$(awk '/^MemAvailable:/ {print $2}' /proc/meminfo)
+    used=$(( (total - avail) * 100 / total ))
+    if (( used >= RAM_WARN )); then
+        fail ram "RAM at ${used}% ($(( avail / 1024 )) MB free)"
+    fi
+
+    local disk
+    disk=$(df -P / | awk 'NR==2 {gsub("%","",$5); print $5}')
+    if (( disk >= DISK_WARN )); then
+        fail disk "Disk at ${disk}% on /"
+    fi
+
+    # containers killed for going over their memory cap since the last run
+    local since=$(( now - 120 ))
+    [[ -f $STATE_DIR/.last_run ]] && since=$(cat "$STATE_DIR/.last_run")
+    local kills
+    kills=$(journalctl -k --since "@$since" --no-pager 2>/dev/null | grep -c "Memory cgroup out of memory" || true)
+    if (( kills > 0 )); then
+        INFO+=("🟡 $NAME: $kills container(s) killed for using too much RAM (players' instances died; they can Stop + Start)")
+    fi
+}
+
+check_platform() {
+    local code
+    code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "$SITE_URL" || true)
+    if [[ ! $code =~ ^(200|301|302|303)$ ]]; then
+        fail site "CTFd site not answering ($SITE_URL -> HTTP ${code:-none})"
+    fi
+    local svc
+    for svc in ctfd db cache nginx; do
+        if [[ -z $(docker ps -q --filter "label=com.docker.compose.service=$svc" --filter status=running 2>/dev/null) ]]; then
+            fail "svc_$svc" "CTFd container '$svc' is not running"
+        fi
+    done
+}
+
+check_chal() {
+    if ! systemctl is-active --quiet ctf-docker-firewall; then
+        fail firewall "Challenge firewall is OFF (containers can reach the internet)"
+    fi
+    if [[ -f $TLS_DIR/key.pem ]]; then
+        local ping
+        ping=$(curl -s --max-time 5 --cacert "$TLS_DIR/ca.pem" --cert "$TLS_DIR/cert.pem" \
+               --key "$TLS_DIR/key.pem" https://127.0.0.1:$API_PORT/_ping || true)
+        [[ $ping == OK ]] || fail dockerapi "Docker API ($API_PORT) not answering, CTFd can't start instances here"
+    fi
+}
+
+check_peers() {
+    local p name addr host port
+    for p in $PEERS; do
+        name=${p%%=*}; addr=${p#*=}; host=${addr%:*}; port=${addr##*:}
+        if ! timeout 5 bash -c "exec 3<>/dev/tcp/$host/$port" 2>/dev/null; then
+            fail "peer_$name" "Can't reach $name ($host:$port), server down or network problem"
+        fi
+    done
+}
+
+# ---------------------------------------------------------------- sending
+send() {
+    local msg=$1 ok=1
+    if [[ -n $TG_BOT_TOKEN && -n $TG_CHAT_ID ]]; then
+        curl -s --max-time 10 -o /dev/null -w '%{http_code}' \
+            --data-urlencode "chat_id=$TG_CHAT_ID" --data-urlencode "text=$msg" \
+            "$TG_API/bot$TG_BOT_TOKEN/sendMessage" | grep -q '^200$' && ok=0
+    fi
+    if [[ -n $DISCORD_WEBHOOK ]]; then
+        local body
+        body=$(python3 -c 'import json,sys; print(json.dumps({"content": sys.argv[1]}))' "$msg")
+        curl -s --max-time 10 -o /dev/null -w '%{http_code}' -H 'Content-Type: application/json' \
+            -d "$body" "$DISCORD_WEBHOOK" | grep -qE '^20[04]$' && ok=0
+    fi
+    return $ok
+}
+
+mins() { if (( $1 < 60 )); then echo "<1"; else echo $(( $1 / 60 )); fi; }
+
+# ---------------------------------------------------------------- main
+run_checks() {
+    check_common
+    case $ROLE in
+        platform) check_platform ;;
+        chal) check_chal ;;
+    esac
+    check_peers
+}
+
+case "${1:-}" in
+    status)
+        run_checks
+        if (( ${#FAIL[@]} == 0 )); then echo "OK: all checks pass on $NAME ($ROLE)"; fi
+        for k in "${!FAIL[@]}"; do echo "FAIL [$k] ${FAIL[$k]}"; done
+        for m in "${INFO[@]}"; do echo "INFO $m"; done
+        ;;
+    test)
+        if [[ -z $TG_BOT_TOKEN$DISCORD_WEBHOOK ]]; then echo "No TG_BOT_TOKEN/TG_CHAT_ID or DISCORD_WEBHOOK in $CONF"; exit 1; fi
+        if send "✅ Test from $NAME ($ROLE): alerts are working"; then echo "sent"; else echo "FAILED to send, check token / chat id / webhook"; exit 1; fi
+        ;;
+    run)
+        mkdir -p "$STATE_DIR"
+        run_checks
+        # new problems + reminders
+        for k in "${!FAIL[@]}"; do
+            f=$STATE_DIR/$k
+            if [[ ! -f $f ]]; then
+                send "🔴 $NAME: ${FAIL[$k]}" && echo "$now $now" > "$f"
+            else
+                read -r first last < "$f"
+                if (( now - last >= REMIND_MIN * 60 )); then
+                    send "🔴 $NAME, still broken ($(mins $((now - first))) min): ${FAIL[$k]}" && echo "$first $now" > "$f"
+                fi
+            fi
+        done
+        # recoveries
+        for f in "$STATE_DIR"/*; do
+            [[ -f $f ]] || continue
+            k=$(basename "$f")
+            if [[ -z ${FAIL[$k]+x} ]]; then
+                read -r first _ < "$f"
+                send "✅ $NAME: recovered [$k] after $(mins $((now - first))) min" && rm -f "$f"
+            fi
+        done
+        for m in "${INFO[@]}"; do send "$m"; done
+        echo "$now" > "$STATE_DIR/.last_run"
+        ;;
+    *)
+        sed -n '2,12p' "$0"; exit 1 ;;
+esac
