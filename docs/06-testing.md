@@ -52,3 +52,31 @@ Notes:
 - Instance "already running" after a CTFd restart → containers live on the challenge server, CTFd just remembers them. Stop it or wait for the 2 h cleanup.
 - Inside the container `ping google.com` fails → correct, containers have no network out.
 - nginx test page says `Server address: 172.17.0.x` → that's the container's Docker-internal IP, normal.
+
+## Crash test (sandbox only)
+
+Goal: find where one challenge server breaks, and check the alerts catch it. Each stress instance holds
+~230 MB and burns its CPU share. On an 8 GB server about 30 fit; more than that should break it.
+
+**Setup (once)**
+1. Challenge server: `cd /opt/ctf/CTFd-Docker-Challenges && sudo git pull && cd tools/stress-image && sudo docker build -t ctf/stress .`
+2. CTFd → Admin → Docker Config → that host → tick `ctf/stress:latest` in the repositories → Update.
+3. Admin → Challenges → Create → type **docker**, name `STRESS`, image `ctf/stress:latest`, any flag, State **Hidden**. Note its ID.
+4. Open `#ctf-status`, `#ctf-alerts`, Kuma, and an SSH window on the challenge server running `watch -n2 free -h`.
+
+**Run in steps** (on the platform, `export CTFD_TOKEN=...` first; `--keep` leaves them running):
+```bash
+cd /opt/ctf/CTFd-Docker-Challenges/tools
+python3 load-test.py --chal <ID> --players 20 --keep    # ~4.6 GB: fine
+python3 load-test.py --chal <ID> --players 30 --keep    # ~7 GB: RAM alert (85 %) expected
+python3 load-test.py --chal <ID> --players 45 --keep    # ~10 GB on 8 GB: should break
+```
+
+**Write down at each step:** RAM (`free -h`), load (`uptime`), how long starts take, what the alerts said and
+how fast, whether the platform and other players' instances still work, and what the kernel killed
+(`sudo journalctl -k | grep -i "out of memory"`).
+
+**Recover**
+- Admin → Docker Status → **Nuke All**, or on the server `sudo docker rm -f $(sudo docker ps -q)`
+- Server not answering at all: GCP console → VM → **Reset**
+- Afterwards: delete the STRESS challenge, `python3 load-test.py --delete-users --players 45 --no-probe` or delete `loadtest-*` users by hand
