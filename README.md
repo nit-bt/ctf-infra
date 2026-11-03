@@ -61,6 +61,7 @@ It also holds `setup-docker-tls.sh` and the `firewall/` scripts.
 | `scripts/backup-ctfd.sh` | platform | DB dump + uploads → `.tar.gz`, pushed to the GCP spare |
 | `scripts/restore-ctfd.sh` | platform / spare | load a backup into CTFd |
 | `scripts/setup-backup-receiver.sh` | GCP spare platform | user that can only receive backups |
+| `scripts/live/` | monitor VM + every server | live board, every 2 s, see [monitoring](docs/monitoring.md#4d-live-board-every-2-s-custom-page) |
 | `scripts/alerts/` | every server | phone alerts (Telegram/Discord) when something breaks, see [emergency](docs/emergency.md) |
 | plugin repo: `setup-docker-tls.sh` | challenge servers | Docker API on :2376 with TLS + client certs |
 | plugin repo: `firewall/harden-chal-host.sh` | challenge servers | block container egress, lock :2376 to the platform |

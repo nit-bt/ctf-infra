@@ -98,6 +98,34 @@ One message per server in a channel (e.g. `#ctf-status`), **edited every minute*
 If a server dies, its card stops updating: the "updated" time keeps growing (e.g. "updated 6 minutes ago"),
 and the alerts above tell you why.
 
+## 4d. Live board (every 2 s, custom page)
+
+Kuma's fastest check is 20 s. For a live view during the event, `scripts/live/` is a small board on the monitor VM:
+each server's agent sends CPU, RAM, disk, load, network and **every instance's RAM/CPU** every 2 s, and a
+password-protected page (club look) shows them live with 5-minute graphs. Cards turn **HOT** (CPU ≥ 90 %, RAM or
+disk ≥ 85 %, amber) or **NO DATA / PROBLEM** (red: server stopped reporting, or the CTFd site doesn't answer).
+Python standard library only; nothing else to install.
+
+**Board (monitor VM, once)**
+```bash
+sudo git clone https://github.com/nit-bt/ctf-infra.git /opt/ctf/ctf-infra   # or git pull
+cd /opt/ctf/ctf-infra && sudo ./scripts/live/install-board.sh
+```
+It prints the page URL, the login, and `LIVE_TOKEN`. GCP: add TCP **3002** to the `kuma` firewall rule.
+
+**Agent (each platform / challenge server)**
+```bash
+cd /opt/ctf/ctf-infra && sudo git pull
+sudo ./scripts/live/install-agent.sh chal          # or: platform
+sudo nano /etc/default/ctf-live                    # LIVE_URL=http://<monitor-ip>:3002 and LIVE_TOKEN=...
+sudo systemctl restart ctf-live-agent
+```
+Use the monitor VM's **internal** IP for `LIVE_URL` from GCP servers (same network), its public IP from Contabo.
+The card appears within 2 s. Login/password: `/etc/default/ctf-live-board` on the monitor VM.
+
+Plain HTTP for now: the page is behind a password, but use it from trusted networks; put it behind HTTPS
+(Cloudflare) once there's a domain.
+
 ## 5. Status page for players (optional)
 
 Status Pages → New → name it after the event → add the site + server monitors → Save → share the link in the players' channel.

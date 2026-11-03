@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CTFC Live</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Press+Start+2P&family=Tiny5&display=swap" rel="stylesheet">
+<style>
+:root {
+  --night: #1a1424; --night-2: #241b31; --night-3: #2f2440; --line: #3d3050;
+  --plum: #6b2d5c; --plum-hi: #8f3d7b;
+  --red: #d0603a; --blue: #4a7fe6; --amber: #e0a43c; --green: #5fb37a;
+  --cream: #f4f5ed; --muted: #b4aac0; --dim: #7d7290;
+  --px: 4px;
+  --arcade: "Press Start 2P", "Tiny5", monospace;
+  --pixel: "Tiny5", "Atkinson Hyperlegible", monospace;
+  --body: "Atkinson Hyperlegible", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--night); color: var(--cream); font-family: var(--body); }
+body { min-height: 100vh; padding: 20px clamp(16px, 3vw, 40px) 40px; }
+
+header { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+h1 { font-family: var(--arcade); font-size: clamp(14px, 2vw, 20px); font-weight: 400; margin: 0; letter-spacing: 0; }
+h1 b { color: var(--red); font-weight: 400; }
+.conn { display: inline-flex; align-items: center; gap: 8px; font-family: var(--pixel); font-size: 15px; color: var(--muted); }
+.dot { width: 10px; height: 10px; background: var(--dim); }
+.dot.ok { background: var(--green); box-shadow: 0 0 0 0 rgba(95,179,122,.7); animation: beat 2s infinite; }
+.dot.bad { background: var(--red); }
+@keyframes beat { 0% { box-shadow: 0 0 0 0 rgba(95,179,122,.6); } 70% { box-shadow: 0 0 0 8px rgba(95,179,122,0); } 100% { box-shadow: 0 0 0 0 rgba(95,179,122,0); } }
+.clock { margin-left: auto; font-family: var(--pixel); font-size: 20px; color: var(--muted); }
+.summary { display: flex; gap: 22px; flex-wrap: wrap; font-family: var(--pixel); font-size: 15px; color: var(--muted); margin: -8px 0 20px; }
+.summary span b { color: var(--cream); font-weight: 400; font-size: 18px; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 430px), 1fr)); gap: 20px; align-items: start; }
+
+.card {
+  --s: var(--px);
+  background: var(--night-2); padding: 18px 18px 14px; position: relative;
+  clip-path: polygon(0 var(--s),var(--s) var(--s),var(--s) 0,calc(100% - var(--s)) 0,calc(100% - var(--s)) var(--s),100% var(--s),100% calc(100% - var(--s)),calc(100% - var(--s)) calc(100% - var(--s)),calc(100% - var(--s)) 100%,var(--s) 100%,var(--s) calc(100% - var(--s)),0 calc(100% - var(--s)));
+  border-top: var(--px) solid var(--green);
+}
+.card.hot { border-top-color: var(--amber); }
+.card.down { border-top-color: var(--red); background: #2a1a24; }
+.card.down .body { opacity: .35; filter: grayscale(.6); }
+
+.top { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; }
+.name { font-family: var(--pixel); font-size: 22px; }
+.role { font-size: 12px; color: var(--muted); border: 1px solid var(--line); padding: 1px 6px; text-transform: lowercase; }
+.state { margin-left: auto; font-family: var(--pixel); font-size: 15px; padding: 2px 8px; background: var(--green); color: var(--night); }
+.hot .state { background: var(--amber); }
+.down .state { background: var(--red); color: var(--cream); }
+.why { font-size: 13px; color: var(--amber); margin: -8px 0 10px; min-height: 0; }
+.down .why { color: #ff9a85; }
+
+.big { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px; }
+.big div { background: var(--night-3); padding: 8px 10px 6px; }
+.big small { display: block; font-size: 12px; color: var(--muted); }
+.big b { font-family: var(--pixel); font-weight: 400; font-size: 30px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.big i { font-style: normal; font-size: 12px; color: var(--muted); display: block; }
+.cpu b { color: #ff8a63; } .ram b { color: #8fb2ff; }
+.big b u { text-decoration: none; font-family: var(--body); font-size: 16px; font-weight: 700; margin-left: 2px; }
+
+.bars { display: grid; gap: 6px; margin-bottom: 12px; }
+.bar { display: grid; grid-template-columns: 44px 1fr 46px; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+.bar .t { height: 10px; background: var(--night-3); position: relative; overflow: hidden; }
+.bar .f { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--muted); transition: width .6s steps(8); }
+.bar.cpu .f { background: var(--red); } .bar.ram .f { background: var(--blue); } .bar.disk .f { background: var(--plum-hi); }
+.bar .f.warn { background: var(--amber); }
+.bar span:last-child { text-align: right; font-variant-numeric: tabular-nums; color: var(--cream); }
+
+canvas { width: 100%; height: 70px; display: block; background: var(--night); margin-bottom: 4px; image-rendering: pixelated; }
+.legend { display: flex; gap: 14px; font-size: 11px; color: var(--dim); margin-bottom: 12px; }
+.legend i { display: inline-block; width: 10px; height: 3px; vertical-align: middle; margin-right: 5px; }
+
+.facts { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+.facts b { color: var(--cream); font-weight: 700; font-variant-numeric: tabular-nums; }
+.facts .bad { color: #ff9a85; }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; font-weight: 400; color: var(--dim); font-size: 11px; padding: 4px 0; border-bottom: 1px solid var(--line); }
+td { padding: 4px 0; border-bottom: 1px solid #2a2138; font-variant-numeric: tabular-nums; }
+td.n { max-width: 0; width: 55%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+td.n small { color: var(--dim); margin-left: 6px; }
+td.r { text-align: right; width: 22%; white-space: nowrap; }
+@media (max-width: 500px) { td .m { display: none; } td.n small { display: none; } }
+td .m { display: inline-block; height: 6px; background: var(--blue); margin-right: 6px; vertical-align: middle; }
+.more { font-size: 12px; color: var(--dim); padding-top: 6px; }
+
+.empty { color: var(--muted); font-family: var(--pixel); font-size: 18px; padding: 40px 0; }
+.foot { margin-top: 26px; font-size: 12px; color: var(--dim); }
+@media (prefers-reduced-motion: reduce) { .dot.ok { animation: none; } .bar .f { transition: none; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>CTFC <b>LIVE</b></h1>
+  <span class="conn"><span class="dot" id="conn-dot"></span><span id="conn-text">connecting...</span></span>
+  <span class="clock" id="clock">--:--:--</span>
+</header>
+<div class="summary" id="summary"></div>
+<main class="grid" id="grid"><div class="empty">Waiting for servers...</div></main>
+<p class="foot">Updates every 2 s. History: last 5 minutes. A card turns red if its server stops reporting for 3 updates.</p>
+
+<script>
+var grid = document.getElementById("grid"), cards = {};
+var WARN = { cpu: 90, ram: 85, disk: 85 };
+
+function fmtB(b) { if (b >= 1073741824) return (b / 1073741824).toFixed(1) + " GB"; if (b >= 1048576) return Math.round(b / 1048576) + " MB"; return Math.round(b / 1024) + " KB"; }
+function fmtRate(b) { if (b >= 1048576) return (b / 1048576).toFixed(1) + " MB/s"; if (b >= 1024) return Math.round(b / 1024) + " KB/s"; return Math.round(b) + " B/s"; }
+function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+function card(name) {
+  if (cards[name]) return cards[name];
+  var el = document.createElement("section");
+  el.className = "card";
+  el.innerHTML =
+    '<div class="top"><span class="name"></span><span class="role"></span><span class="state"></span></div>' +
+    '<div class="why"></div>' +
+    '<div class="body">' +
+    '<div class="big"><div class="cpu"><small>CPU</small><b class="v-cpu">-</b><i class="v-ncpu"></i></div>' +
+    '<div class="ram"><small>RAM</small><b class="v-ram">-</b><i class="v-ramabs"></i></div>' +
+    '<div><small>Load</small><b class="v-load">-</b><i>1 min avg</i></div></div>' +
+    '<div class="bars">' +
+    '<div class="bar cpu"><span>CPU</span><div class="t"><div class="f"></div></div><span class="p"></span></div>' +
+    '<div class="bar ram"><span>RAM</span><div class="t"><div class="f"></div></div><span class="p"></span></div>' +
+    '<div class="bar disk"><span>Disk</span><div class="t"><div class="f"></div></div><span class="p"></span></div></div>' +
+    '<canvas width="600" height="70"></canvas>' +
+    '<div class="legend"><span><i style="background:var(--red)"></i>CPU</span><span><i style="background:var(--blue)"></i>RAM</span><span>last 5 min</span></div>' +
+    '<div class="facts"></div><div class="list"></div></div>';
+  if (grid.querySelector(".empty")) grid.innerHTML = "";
+  grid.appendChild(el);
+  cards[name] = el;
+  return el;
+}
+
+function setBar(el, sel, pct, warn) {
+  var b = el.querySelector(".bar." + sel);
+  var f = b.querySelector(".f");
+  f.style.width = Math.min(100, pct) + "%";
+  f.classList.toggle("warn", pct >= warn);
+  b.querySelector(".p").textContent = Math.round(pct) + "%";
+}
+
+function spark(cv, hist) {
+  var dpr = 1, w = cv.width, h = cv.height, x = cv.getContext("2d");
+  x.clearRect(0, 0, w, h);
+  x.fillStyle = "#2a2138";
+  for (var g = 1; g < 4; g++) x.fillRect(0, Math.round(h * g / 4), w, 1);
+  [[1, "#d0603a"], [2, "#4a7fe6"]].forEach(function (s) {
+    x.fillStyle = s[1];
+    hist.forEach(function (p) {
+      var px = Math.round(w + p[0] / 300 * w), py = Math.round(h - 2 - (Math.min(100, p[s[0]]) / 100) * (h - 4));
+      x.fillRect(px - 2, py - 1, 4, 3);
+    });
+  });
+}
+
+function render(snap) {
+  var up = 0, down = 0, hot = 0, inst = 0, seen = {};
+  snap.servers.forEach(function (d) {
+    seen[d.name] = 1;
+    var el = card(d.name);
+    var ramPct = 100 * d.ram_used / Math.max(1, d.ram_total);
+    var stale = d.age > Math.max(6, (d.interval || 2) * 3);
+    var why = [];
+    if (stale) why.push("No data for " + Math.round(d.age) + " s: server down, overloaded, or can't reach the board");
+    if (!stale && d.cpu >= WARN.cpu) why.push("CPU " + Math.round(d.cpu) + "%");
+    if (!stale && ramPct >= WARN.ram) why.push("RAM " + Math.round(ramPct) + "%");
+    if (!stale && d.disk >= WARN.disk) why.push("Disk " + Math.round(d.disk) + "%");
+    var siteBad = d.role === "platform" && d.site && !(d.site.code >= 200 && d.site.code < 400);
+    if (!stale && siteBad) why.push("Site answers HTTP " + (d.site.code || "nothing"));
+    var state = stale || siteBad ? "down" : (why.length ? "hot" : "ok");
+    el.className = "card " + state;
+    if (state === "down") down++; else up++;
+    if (state === "hot") hot++;
+    if (d.role === "chal") inst += d.containers || 0;
+
+    el.querySelector(".name").textContent = d.name;
+    el.querySelector(".role").textContent = d.role;
+    el.querySelector(".state").textContent = state === "down" ? (stale ? "NO DATA" : "PROBLEM") : state === "hot" ? "HOT" : "OK";
+    el.querySelector(".why").textContent = why.join(" · ");
+    el.querySelector(".v-cpu").innerHTML = Math.round(d.cpu) + "<u>%</u>";
+    el.querySelector(".v-ncpu").textContent = d.ncpu + " vCPU";
+    el.querySelector(".v-ram").innerHTML = Math.round(ramPct) + "<u>%</u>";
+    el.querySelector(".v-ramabs").textContent = fmtB(d.ram_used) + " / " + fmtB(d.ram_total);
+    el.querySelector(".v-load").textContent = d.load.toFixed(1);
+    setBar(el, "cpu", d.cpu, WARN.cpu);
+    setBar(el, "ram", ramPct, WARN.ram);
+    setBar(el, "disk", d.disk, WARN.disk);
+    spark(el.querySelector("canvas"), d.hist || []);
+
+    var label = d.role === "chal" ? "Instances" : "Containers";
+    var f = '<span>' + label + ' <b>' + d.containers + '</b> using <b>' + fmtB(d.cont_mem || 0) + '</b></span>' +
+            '<span>Net <b>↓ ' + fmtRate(d.net_in) + '</b> <b>↑ ' + fmtRate(d.net_out) + '</b></span>';
+    if (d.role === "platform" && d.site) {
+      f += '<span class="' + (siteBad ? "bad" : "") + '">Site <b>' + (d.site.code || "down") + '</b> in <b>' + d.site.ms + ' ms</b></span>';
+    }
+    el.querySelector(".facts").innerHTML = f;
+
+    var top = d.top || [], max = Math.max(1, d.ram_total / Math.max(1, d.containers || 1), top.length ? top[0].mem : 1);
+    var rows = top.map(function (c) {
+      return '<tr><td class="n">' + esc(c.name) + '<small>' + esc((c.image || "").split("@")[0]) + '</small></td>' +
+             '<td class="r"><span class="m" style="width:' + Math.max(2, Math.round(40 * c.mem / max)) + 'px"></span>' + fmtB(c.mem) + '</td>' +
+             '<td class="r">' + c.cpu.toFixed(0) + '%</td></tr>';
+    }).join("");
+    el.querySelector(".list").innerHTML = top.length
+      ? '<table><thead><tr><th>' + (d.role === "chal" ? "Instance" : "Container") + ' (by RAM)</th><th class="r">RAM</th><th class="r">CPU</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+        (d.containers > top.length ? '<div class="more">+ ' + (d.containers - top.length) + ' more</div>' : "")
+      : '<div class="more">No containers running.</div>';
+  });
+  Object.keys(cards).forEach(function (n) { if (!seen[n]) { cards[n].remove(); delete cards[n]; } });
+  document.getElementById("summary").innerHTML =
+    '<span>Servers <b>' + snap.servers.length + '</b></span><span>Up <b>' + up + '</b></span>' +
+    '<span>Hot <b>' + hot + '</b></span><span>Down <b>' + down + '</b></span><span>Instances <b>' + inst + '</b></span>';
+}
+
+function tick() { document.getElementById("clock").textContent = new Date().toLocaleTimeString([], { hour12: false }); }
+setInterval(tick, 1000); tick();
+
+function connect() {
+  var dot = document.getElementById("conn-dot"), txt = document.getElementById("conn-text");
+  var es = new EventSource("stream");
+  es.onopen = function () { dot.className = "dot ok"; txt.textContent = "live"; };
+  es.onmessage = function (e) { render(JSON.parse(e.data)); };
+  es.onerror = function () { dot.className = "dot bad"; txt.textContent = "reconnecting..."; };
+}
+connect();
+</script>
+</body>
+</html>
