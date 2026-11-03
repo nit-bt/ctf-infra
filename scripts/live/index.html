@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CTFC Live</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Press+Start+2P&family=Tiny5&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
 :root {
   --night: #1a1424; --night-2: #241b31; --night-3: #2f2440; --line: #3d3050;
@@ -14,7 +14,7 @@
   --cream: #f4f5ed; --muted: #b4aac0; --dim: #7d7290;
   --px: 4px;
   --arcade: "Press Start 2P", "Tiny5", monospace;
-  --pixel: "Tiny5", "Atkinson Hyperlegible", monospace;
+  --pixel: "Atkinson Hyperlegible", system-ui, sans-serif;   /* readable at a glance; pixel font only in the logo */
   --body: "Atkinson Hyperlegible", system-ui, sans-serif;
 }
 * { box-sizing: border-box; }
@@ -123,6 +123,18 @@ pre.cmd { background: var(--night); border: 1px solid var(--line); padding: 12px
 .empty { color: var(--muted); font-family: var(--pixel); font-size: 18px; padding: 40px 0; }
 .foot { margin-top: 26px; font-size: 12px; color: var(--dim); }
 @media (prefers-reduced-motion: reduce) { .dot.ok { animation: none; } .bar .f { transition: none; } }
+
+/* clean font tuning */
+.name { font-size: 20px; font-weight: 700; }
+.big b { font-size: 30px; font-weight: 700; letter-spacing: -0.01em; }
+.big b u { font-size: 15px; color: var(--muted); }
+.state, .btn, nav.tabs a, .conn, .summary, .clock { font-weight: 700; }
+.state { font-size: 13px; letter-spacing: .04em; }
+.summary { font-size: 14px; } .summary span b { font-size: 17px; }
+.clock { font-size: 18px; font-variant-numeric: tabular-nums; }
+nav.tabs a { font-size: 15px; }
+.panel h2 { font-size: 18px; font-weight: 700; }
+.btn { font-size: 14px; } .btn.small { font-size: 13px; }
 </style>
 </head>
 <body>
