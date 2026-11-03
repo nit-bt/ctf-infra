@@ -9,6 +9,8 @@ Built first in a **GCP sandbox**, then replayed on **Contabo** for the real even
 | Internal CTF | Nov 2026, 3rd week, 9:00-17:00, online | ~25 players, **solo** (Users mode), 17 challenges | 1 platform + 1 challenge server |
 | ATC CTF | 21 Feb 2027, on-site at AUPP | ~100 players, teams of 4 (Teams mode) | 1 platform + 3 challenge servers |
 
+> Monitoring (alerts, Kuma, live board) lives in its own repo: **[ctfc-monitor](https://github.com/nit-bt/ctfc-monitor)**.
+
 ## How it fits together
 
 ```
@@ -46,8 +48,7 @@ It also holds `setup-docker-tls.sh` and the `firewall/` scripts.
 | 7 | [docs/07-production-contabo.md](docs/07-production-contabo.md) | Moving to Contabo, domain, HTTPS, backups |
 | - | [branding/](branding/) | Club look: logo, favicon, theme, home page |
 | - | [docs/emergency.md](docs/emergency.md) | **Event day:** alert → fix, fire drill |
-| - | [docs/domain.md](docs/domain.md) | ctfc.live: Cloudflare DNS, HTTPS for Kuma + live board, names for the event |
-| - | [docs/monitoring.md](docs/monitoring.md) | Permanent dashboard (Uptime Kuma) watching every event from outside |
+| - | [docs/domain.md](docs/domain.md) | ctfc.live: Cloudflare DNS and the event's names (monitoring HTTPS is in ctfc-monitor) |
 | - | [docs/failover.md](docs/failover.md) | GCP spares: backups every 15 min, switch over if a Contabo server dies |
 | - | [docs/troubleshooting.md](docs/troubleshooting.md) | Every error we hit and the fix |
 | - | [docs/decisions.md](docs/decisions.md) | Why things are the way they are |
@@ -62,9 +63,7 @@ It also holds `setup-docker-tls.sh` and the `firewall/` scripts.
 | `scripts/backup-ctfd.sh` | platform | DB dump + uploads → `.tar.gz`, pushed to the GCP spare |
 | `scripts/restore-ctfd.sh` | platform / spare | load a backup into CTFd |
 | `scripts/setup-backup-receiver.sh` | GCP spare platform | user that can only receive backups |
-| `scripts/monitor/setup-https.sh` | monitor VM | HTTPS (Caddy) for kuma./live.<domain> |
-| `scripts/live/` | monitor VM + every server | live board, every 2 s, see [monitoring](docs/monitoring.md#4d-live-board-every-2-s-custom-page) |
-| `scripts/alerts/` | every server | phone alerts (Telegram/Discord) when something breaks, see [emergency](docs/emergency.md) |
+| **[ctfc-monitor](https://github.com/nit-bt/ctfc-monitor)** repo | monitor VM + every server | alerts (Discord/Telegram), Uptime Kuma, live board, HTTPS for kuma./live.ctfc.live |
 | plugin repo: `setup-docker-tls.sh` | challenge servers | Docker API on :2376 with TLS + client certs |
 | plugin repo: `firewall/harden-chal-host.sh` | challenge servers | block container egress, lock :2376 to the platform |
 
