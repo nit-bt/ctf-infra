@@ -1,51 +1,65 @@
-# ATC event network (no AI, no internet)
+# ATC event network (internet on, AI chatbots blocked)
 
-ATC runs on the **school Wi-Fi**, so school IT sets the rules. The idea: players get a separate Wi-Fi that can reach
-**only our CTF servers**. Everything else (ChatGPT, Claude, Google, VPNs, Discord) fails because it isn't allowed.
+ATC runs on the **school Wi-Fi**, so school IT sets the rules. Players get a separate Wi-Fi with normal internet
+(Google, Google search AI answers and docs are fine), but **AI chatbots are blocked**: ChatGPT, Claude, DeepSeek, Gemini and the others.
+
+This is a **blocklist**: it stops the known AI sites and the usual ways around them (VPN, other DNS), not 100 %.
+The rest is rules + proctors. (A stricter option, "only our servers, no internet", is in git history: commit `5be14f6`.)
 
 ## 1. What to ask school IT
 
-Send this **at least 3 weeks before** the event (fill in the IPs once the ATC servers exist):
+Send this **at least 3 weeks before** the event:
 
 | # | Ask | Why |
 |---|---|---|
-| 1 | A separate SSID, e.g. `ATC-CTF`, with its own password and its own VLAN, on only for the event day, in the event room only | players never touch the normal school network |
+| 1 | A separate SSID, e.g. `ATC-CTF`, own password and VLAN, on only for the event day, in the event room only | rules apply only to players |
 | 2 | **Client isolation** on that SSID | players can't attack each other's laptops |
-| 3 | Firewall policy for that VLAN: **default deny everything** | the allowlist |
-| 4 | Allow **TCP 80, 443** to `<platform-ip>` | the CTF site |
-| 5 | Allow **TCP 30000-31000** to `<chal1-ip>`, `<chal2-ip>`, `<chal3-ip>` | challenge instances |
-| 6 | Allow **DNS (53) only to the firewall's own DNS**, block 53/853 anywhere else | no other DNS, no DNS-over-TLS |
-| 7 | That DNS answers **only** `atc.ctfc.live`, `chal1/2/3.ctfc.live` (static entries), **no forwarding** to the internet | other names "don't exist", no DNS tunnels |
-| 8 | Block all other UDP (QUIC, WireGuard, etc.) | closes UDP VPNs |
-| 9 | Wired ports in the room: off, or on the same VLAN | no way around the Wi-Fi |
-| 10 | A test slot one week before, and an IT contact on the day | see section 3 |
+| 3 | Web filter on that VLAN: block category **Artificial Intelligence / Generative AI** (FortiGuard, Sophos, Palo Alto, Cisco all have it) **+ the list in section 2** | the AI block |
+| 4 | Block category **Proxy Avoidance / VPN / Anonymizers** | stops VPNs |
+| 5 | Force DNS: allow DNS (53) **only to the school DNS**; block 53/853 elsewhere and the DNS-over-HTTPS servers (category or list below) | players can't skip the filter with 8.8.8.8 or Secure DNS |
+| 6 | Block **UDP 443 (QUIC)** and other outbound UDP except DNS to the school DNS | QUIC and WireGuard VPNs slip past filters |
+| 7 | HTTPS filtering by **domain name (SNI)**, no need to decrypt traffic | works without installing certificates on laptops |
+| 8 | Wired ports in the room: off, or on the same VLAN | no way around the Wi-Fi |
+| 9 | A test slot one week before, and an IT contact on the day | section 4 |
 
-Organizers need normal internet (Discord, monitoring): a **different SSID or staff wired port**, not `ATC-CTF`.
+## 2. Block list (domains, include all subdomains)
 
-## 2. Our side
+**Chatbots**
+`chatgpt.com` `openai.com` `oaiusercontent.com` `claude.ai` `claude.com` `anthropic.com` `deepseek.com`
+`gemini.google.com` `aistudio.google.com` `bard.google.com` `notebooklm.google.com`
+`copilot.microsoft.com` `copilot.cloud.microsoft` `perplexity.ai` `poe.com` `grok.com` `x.ai` `meta.ai`
+`chat.mistral.ai` `kimi.com` `kimi.ai` `moonshot.cn` `chat.qwen.ai` `tongyi.aliyun.com` `doubao.com` `chatglm.cn` `z.ai`
+`huggingface.co` `hf.space` `character.ai` `you.com` `phind.com` `blackbox.ai` `duck.ai` `lmarena.ai` `openrouter.ai`
+`groq.com` `together.ai` `chatbotapp.ai` `monica.im` `merlin.foyer.work` `getmerlin.in`
 
-- [ ] `atc.ctfc.live` in Cloudflare: **DNS only (grey cloud)** for the event. Orange = Cloudflare's shared IPs = WARP and thousands of other sites would be reachable.
-- [ ] Platform HTTPS: **Let's Encrypt** certificate instead of the Cloudflare origin certificate (browsers don't trust the origin one directly). Do it the day before, check in a browser.
-- [ ] **Self-host the theme fonts** (`branding/theme-header.html` loads Google Fonts → blocked → site falls back to plain fonts).
-- [ ] No challenge needs the internet (no OSINT, no external APIs, no `pip install` inside instances).
-- [ ] Tools players need are on our servers: CyberChef self-hosted, challenge files in CTFd, offline cheat sheet.
-- [ ] Support on the day = raise a hand (players can't reach Discord).
-- [ ] Rules sheet: no phones/hotspots, no local AI models (Ollama, LM Studio, etc.), caught = disqualified. Proctors walk around.
+**AI used from apps / code editors** (VS Code extensions, scripts)
+`api.openai.com` `api.anthropic.com` `api.deepseek.com` `generativelanguage.googleapis.com`
+`githubcopilot.com` `copilot-proxy.githubusercontent.com` `api.githubcopilot.com` `cursor.sh` `cursor.com` `codeium.com` `windsurf.com`
 
-After the event: `atc.ctfc.live` back to orange cloud, origin certificate back.
+**Ways around the filter**
+`dns.google` `cloudflare-dns.com` `one.one.one.one` `dns.quad9.net` `doh.opendns.com` `nextdns.io` `dns.adguard-dns.com`
+`mask.icloud.com` `mask-h2.icloud.com` (iCloud Private Relay) · `cloudflareclient.com` (WARP)
+`use-application-dns.net` → make it **not exist** (turns off Firefox's automatic DoH)
 
-## 3. Test (one week before, on `ATC-CTF`, with a normal laptop)
+Category 3 catches new and unknown AI sites; this list makes sure the big ones are blocked even if a category misses them.
+
+## 3. Our side
+
+- [ ] Rules sheet: no AI chatbots, no VPN/hotspot, no local AI models (Ollama, LM Studio), AI extensions off. Caught = disqualified.
+- [ ] Phones collected or face-down; proctors walk around.
+- [ ] Optional: block Discord/Telegram/Messenger on `ATC-CTF` too (stops sharing flags between teams, and Telegram AI bots).
+
+## 4. Test (one week before, on `ATC-CTF`, with a normal laptop)
 
 | Test | Must |
 |---|---|
-| `https://atc.ctfc.live` (login, open a challenge, download a file) | ✅ work |
-| Start an instance, open its link | ✅ work |
-| `chatgpt.com`, `claude.ai`, `gemini.google.com`, `google.com` | ❌ fail |
-| `nslookup chatgpt.com` | ❌ no answer |
+| `https://atc.ctfc.live`, start an instance, open its link | ✅ work |
+| `google.com` search, docs sites, GitHub | ✅ work |
+| `chatgpt.com`, `claude.ai`, `chat.deepseek.com`, `gemini.google.com`, `perplexity.ai`, `copilot.microsoft.com` | ❌ blocked |
+| A small AI site not on the list (pick one) | ❌ blocked (= the category works) |
 | `nslookup chatgpt.com 8.8.8.8` | ❌ timeout |
-| A VPN app (e.g. Proton VPN free) | ❌ can't connect |
-| Cloudflare WARP (1.1.1.1 app) | ❌ can't connect |
-| Ping / open another laptop on `ATC-CTF` | ❌ fail (client isolation) |
-| Chrome "Secure DNS" on, then `chatgpt.com` | ❌ fail |
+| Chrome Secure DNS on, then `chatgpt.com` | ❌ blocked |
+| A VPN app (e.g. Proton VPN free), Cloudflare WARP | ❌ can't connect |
+| Ping another laptop on `ATC-CTF` | ❌ fail |
 
-Any ❌ that works → send IT the exact test that got through.
+Anything that gets through → send IT the exact test.
