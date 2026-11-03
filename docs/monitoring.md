@@ -113,7 +113,14 @@ cd /opt/ctf/ctf-infra && sudo ./scripts/live/install-board.sh
 ```
 It prints the page URL, the login, and `LIVE_TOKEN`. GCP: add TCP **3002** to the `kuma` firewall rule.
 
-**Agent (each platform / challenge server)**
+**Add / remove VMs: Servers tab** (top of the page)
+- **Add a VM:** name (e.g. `contabo-chal-1`) + role → the page shows the exact command to paste on that VM
+  (installs the agent with the right URL, token and name). Its card shows *WAITING* until the agent reports.
+- **Remove:** for VMs shut down for good. A removed VM stays hidden even if its agent keeps sending;
+  "Add back" brings it back. The list is saved on the monitor VM (`/var/lib/ctf-live/servers.json`).
+- An agent that reports with a new name is added automatically.
+
+**Agent by hand (each platform / challenge server)**
 ```bash
 cd /opt/ctf/ctf-infra && sudo git pull
 sudo ./scripts/live/install-agent.sh chal          # or: platform

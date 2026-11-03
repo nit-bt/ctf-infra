@@ -35,6 +35,7 @@ User=ctflive
 ExecStart=/usr/bin/python3 /opt/ctf-live/board.py
 Restart=always
 RestartSec=2
+StateDirectory=ctf-live
 NoNewPrivileges=true
 ProtectSystem=strict
 ProtectHome=true
