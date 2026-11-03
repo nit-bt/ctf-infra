@@ -90,6 +90,22 @@ sudo docker compose start ctfd
 ```
 The dump replaces the whole `ctfd` database (users, solves, challenges, config). Instances still running on challenge servers are cleaned up by the sweep. Practise this once on GCP before the event.
 
+### Snapshots (snap back)
+
+Contabo panel → **Servers & Hosting → VPS → More → Create Snapshot**; roll back from the same menu (**Snapshots → Rollback**).
+Rules: free, a few per server (the panel shows your plan's number), **deleted after 30 days**, can't be downloaded, not a backup.
+Rolling back to an older snapshot **deletes the newer ones**. Everything written after the snapshot is lost.
+
+| Snapshot | When | Both servers |
+|---|---|---|
+| `clean` | OS + `harden-base.sh` + Docker done, nothing else | broke the setup → roll back, redo from there |
+| `frozen` | day before the event, challenges loaded, test run done, test data removed | event-day disaster (hacked, broken config) |
+
+Event-day disaster on the **platform**: roll back to `frozen` (players and solves since then are gone), then bring them back
+from the newest backup on the GCP spare: copy `/srv/ctfd-backups/<newest>` to the platform (via your laptop), then
+`sudo ./scripts/restore-ctfd.sh /tmp/ctfd-YYYYMMDD-HHMM.tar.gz`. Loss = up to 15 min. Faster if the box is just dead: failover.md scenario C.
+Disaster on a **challenge server**: roll back to `frozen`, then Admin → Docker Status → **Nuke All** to clear old instance records.
+
 Cancelling a Contabo VPS **wipes the disk**, snapshots included. Check Contabo's cancellation notice period so you're not billed an extra month.
 
 ## Timeline (internal CTF)
