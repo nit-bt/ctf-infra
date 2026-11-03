@@ -56,7 +56,7 @@ Add New Monitor, one per line, interval 60 s, retries 2 (so one slow check isn't
 
 | Monitor type | Target | Shows |
 |---|---|---|
-| HTTP(s) - Keyword | `https://ctf.<domain>/`, keyword `CTFd` | site up and really serving CTFd |
+| HTTP(s) - Keyword | `https://internal.ctfc.live/`, keyword `CTFd` | site up and really serving CTFd |
 | Ping | platform IP | server alive |
 | Ping | each challenge server IP | server alive |
 | TCP Port | a challenge server IP, port `22` | server alive even if ping is blocked |

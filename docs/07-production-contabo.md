@@ -53,7 +53,7 @@ Domain via GitHub Student Pack: **`.me` or `.tech`**. Not `.dev` / `.app`: brows
 
 | Record | Points to | Cloudflare |
 |---|---|---|
-| `ctf.<domain>` | platform IP | 🟠 proxied (hides IP, DDoS protection) |
+| `internal.ctfc.live` | platform IP | 🟠 proxied (hides IP, DDoS protection) |
 | `chal1.<domain>` … | challenge server IP | ⚪ DNS only (Cloudflare can't pass ports 30000-31000) |
 
 - Cloudflare SSL mode **Full (strict)** + **Origin certificate** on the platform's nginx (port 443)

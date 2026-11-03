@@ -19,7 +19,7 @@ Addresses first: a failover is only quick if nothing has to be looked up or re-t
 1. **Static IPs on GCP.** VPC network > IP addresses > reserve the external IP of both spare VMs.
    An ephemeral IP changes on every stop/start and breaks everything below.
 2. **Cloudflare DNS** (docs/07):
-   - `ctf.<domain>` → Contabo platform, **proxied** 🟠: switching it to GCP takes effect in seconds, no TTL wait.
+   - `internal.ctfc.live` → Contabo platform, **proxied** 🟠: switching it to GCP takes effect in seconds, no TTL wait.
    - `chal1.<domain>` → Contabo challenge server, DNS only, **TTL 1 min**.
    - Put the **same Cloudflare origin certificate** on both platforms' nginx, so HTTPS works on GCP the moment DNS points there.
 3. **Spare platform ready:** CTFd installed exactly like Contabo (docs/03 + 07: same CTFd version, same plugin, same `docker-compose.yml`). Theme doesn't matter, the restore brings it.
@@ -70,7 +70,7 @@ Static challenges keep working. Instanced ones fail to start.
    ls -lt /srv/ctfd-backups | head -3                    # newest backup: how old is it?
    sudo ./scripts/restore-ctfd.sh                       # restores the newest, type RESTORE
    ```
-3. Cloudflare → DNS → `ctf.<domain>` → change IP to the **GCP spare platform** → Save. Works within seconds (proxied).
+3. Cloudflare → DNS → `internal.ctfc.live` → change IP to the **GCP spare platform** → Save. Works within seconds (proxied).
 4. Admin > Docker Config: hosts **UP**?
    - Contabo challenge server still alive → it is, because its firewall allows the GCP platform (step A5).
    - Dead too → scenario B step 2 (switch challenges to **spare**).
