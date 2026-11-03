@@ -130,8 +130,13 @@ sudo systemctl restart ctf-live-agent
 Use the monitor VM's **internal** IP for `LIVE_URL` from GCP servers (same network), its public IP from Contabo.
 The card appears within 2 s. Login/password: `/etc/default/ctf-live-board` on the monitor VM.
 
-Plain HTTP for now: the page is behind a password, but use it from trusted networks; put it behind HTTPS
-(Cloudflare) once there's a domain.
+**Login:** a proper login page (no browser pop-up).
+- Username `admin`; the password is shown **once** when the board is first installed. Only a PBKDF2 hash is stored.
+- Change it any time: `sudo ctf-live-passwd` (everyone gets logged out).
+- 5 wrong tries from one network locks that network out for 15 min; 50 failures overall pause all logins for 5 min.
+- Sessions last 12 h (cookie is HttpOnly, Secure over HTTPS, SameSite=Strict). **Log out** button top right.
+- Failed and successful logins are logged: `sudo journalctl -u ctf-live-board | grep login`.
+- Use it over HTTPS: https://live.ctfc.live (docs/domain.md).
 
 ## 5. Status page for players (optional)
 
