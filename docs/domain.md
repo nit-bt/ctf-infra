@@ -9,7 +9,8 @@ free HTTPS, hides server IPs, DDoS protection, and switching servers takes secon
 |---|---|---|---|
 | `kuma.ctfc.live` | monitor VM | 🟠 Proxied | Uptime Kuma (history, alerts, status page) |
 | `live.ctfc.live` | monitor VM | 🟠 Proxied | live board |
-| `ctf.ctfc.live` | Contabo platform | 🟠 Proxied | the CTF site *(when Contabo exists)* |
+| `internal.ctfc.live` | Contabo platform | 🟠 Proxied | the internal CTF site *(when Contabo exists)* |
+| `atc.ctfc.live` | ATC platform (Feb) | 🟠 Proxied | the ATC CTF site, later |
 | `chal1.ctfc.live` | Contabo challenge server | ⚪ **DNS only** | instance links (`http://chal1.ctfc.live:30123`). Cloudflare can't carry ports 30000-31000 |
 
 ## 1. Namecheap → Cloudflare (once)
@@ -55,11 +56,11 @@ Everything now goes through HTTPS, so the old `http://IP:3001` / `:3002` should 
 
 ## 6. Later: the CTF itself
 
-When the Contabo servers exist (docs/07): add `ctf` (🟠) and `chal1` (⚪), set each challenge server's
+When the Contabo servers exist (docs/07): add `internal` (🟠) and `chal1` (⚪), set each challenge server's
 **Public address** in CTFd Docker Config to `chal1.ctfc.live`. Moving servers is then only a DNS change.
 
 ## Optional: login wall for Kuma and the board
 
 Cloudflare → Zero Trust (free up to 50 users) → Access → Applications → Add → Self-hosted →
 `kuma.ctfc.live` and `live.ctfc.live` → policy: emails of the organizers. Anyone else can't even reach the login page.
-Don't do this for `ctf.ctfc.live` (players) or `chal1` (not proxied).
+Don't do this for `internal.ctfc.live` (players) or `chal1` (not proxied).
