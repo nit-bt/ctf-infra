@@ -46,6 +46,7 @@ It also holds `setup-docker-tls.sh` and the `firewall/` scripts.
 | 7 | [docs/07-production-contabo.md](docs/07-production-contabo.md) | Moving to Contabo, domain, HTTPS, backups |
 | - | [branding/](branding/) | Club look: logo, favicon, theme, home page |
 | - | [docs/emergency.md](docs/emergency.md) | **Event day:** alert → fix, fire drill |
+| - | [docs/domain.md](docs/domain.md) | ctfc.live: Cloudflare DNS, HTTPS for Kuma + live board, names for the event |
 | - | [docs/monitoring.md](docs/monitoring.md) | Permanent dashboard (Uptime Kuma) watching every event from outside |
 | - | [docs/failover.md](docs/failover.md) | GCP spares: backups every 15 min, switch over if a Contabo server dies |
 | - | [docs/troubleshooting.md](docs/troubleshooting.md) | Every error we hit and the fix |
@@ -61,6 +62,7 @@ It also holds `setup-docker-tls.sh` and the `firewall/` scripts.
 | `scripts/backup-ctfd.sh` | platform | DB dump + uploads → `.tar.gz`, pushed to the GCP spare |
 | `scripts/restore-ctfd.sh` | platform / spare | load a backup into CTFd |
 | `scripts/setup-backup-receiver.sh` | GCP spare platform | user that can only receive backups |
+| `scripts/monitor/setup-https.sh` | monitor VM | HTTPS (Caddy) for kuma./live.<domain> |
 | `scripts/live/` | monitor VM + every server | live board, every 2 s, see [monitoring](docs/monitoring.md#4d-live-board-every-2-s-custom-page) |
 | `scripts/alerts/` | every server | phone alerts (Telegram/Discord) when something breaks, see [emergency](docs/emergency.md) |
 | plugin repo: `setup-docker-tls.sh` | challenge servers | Docker API on :2376 with TLS + client certs |
