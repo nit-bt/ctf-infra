@@ -36,11 +36,24 @@ GCP → VPC network → Firewall → rule `kuma` → Edit → TCP ports `80,443,
 
 ## 4. HTTPS on the monitor VM
 
+**a. Origin certificate (once, free, valid 15 years):** Cloudflare → `ctfc.live` → **SSL/TLS** → **Origin Server** →
+**Create Certificate** → keep the defaults (RSA, `*.ctfc.live` + `ctfc.live`, 15 years) → **Create**.
+It shows two boxes. On the monitor VM:
+```bash
+sudo mkdir -p /etc/caddy
+sudo nano /etc/caddy/origin.pem     # paste the "Origin Certificate" box, save
+sudo nano /etc/caddy/origin.key     # paste the "Private Key" box, save (shown only once)
+```
+**b. Install Caddy + config:**
 ```bash
 cd /opt/ctf/ctf-infra && sudo git pull
 sudo ./scripts/monitor/setup-https.sh ctfc.live
 ```
-After ~1 minute: **https://kuma.ctfc.live** and **https://live.ctfc.live** work (same logins as before).
+**c.** Cloudflare → SSL/TLS → Edge Certificates: the Universal certificate shows **Active** (5-15 min after the
+domain goes active). Then **https://kuma.ctfc.live** and **https://live.ctfc.live** work (same logins as before).
+
+The same origin certificate covers `internal.ctfc.live` and `atc.ctfc.live` later (it's `*.ctfc.live`):
+copy the two files to the platform's nginx.
 
 Kuma → Settings → General → **Primary Base URL** = `https://kuma.ctfc.live` (links in notifications).
 
