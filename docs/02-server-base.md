@@ -53,7 +53,7 @@ When everyone can log in:
 ```bash
 sudo /opt/ctf/ctf-infra/scripts/setup-users.sh harden-ssh
 ```
-→ keys only, no root login. **Keep your current session open** and test a new login in a second terminal before closing it.
+→ keys only, no root login (the script checks with `sshd -T`; Contabo/cloud images ship their own `50-cloud-init.conf` that turns passwords back on, so ours is `01-ctf.conf`, read first). **Keep your current session open** and test a new login in a second terminal before closing it.
 
 Who did what: `sudo journalctl _COMM=sudo` · Remove someone: `setup-users.sh remove <user>`
 

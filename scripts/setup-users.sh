@@ -62,14 +62,23 @@ cmd_harden() {
     echo "No sudo user with an SSH key yet. Run 'add' first, test the login, then harden."
     exit 1
   fi
-  cat > /etc/ssh/sshd_config.d/90-ctf.conf <<'CONF'
+  # 01- so it is read FIRST: sshd keeps the first value it sees, and images (cloud-init, Contabo)
+  # ship e.g. 50-cloud-init.conf with "PasswordAuthentication yes"
+  rm -f /etc/ssh/sshd_config.d/90-ctf.conf
+  cat > /etc/ssh/sshd_config.d/01-ctf.conf <<'CONF'
 PermitRootLogin no
 PasswordAuthentication no
 KbdInteractiveAuthentication no
 CONF
   sshd -t
   systemctl restart ssh
-  echo "SSH: keys only, no root login."
+  local eff; eff=$(sshd -T 2>/dev/null)
+  if ! grep -qx "permitrootlogin no" <<<"$eff" || ! grep -qx "passwordauthentication no" <<<"$eff"; then
+    echo "!! sshd still allows root or passwords. Check: sudo sshd -T | grep -E 'permitroot|passwordauth'"
+    echo "   and files in /etc/ssh/sshd_config.d/ (and Match blocks in /etc/ssh/sshd_config)"
+    exit 1
+  fi
+  echo "SSH: keys only, no root login (checked with sshd -T)."
   echo "KEEP THIS SESSION OPEN and test a fresh login in another terminal first."
 }
 
