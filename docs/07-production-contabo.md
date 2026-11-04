@@ -93,13 +93,13 @@ The dump replaces the whole `ctfd` database (users, solves, challenges, config).
 ### Snapshots (snap back)
 
 Contabo panel → **Servers & Hosting → VPS → More → Create Snapshot**; roll back from the same menu (**Snapshots → Rollback**).
-Rules: free, a few per server (the panel shows your plan's number), **deleted after 30 days**, can't be downloaded, not a backup.
+Rules: free, **only 1 per server on our plan** (4 vCPU / 8 GB), **deleted after 30 days**, can't be downloaded, not a backup.
 Rolling back to an older snapshot **deletes the newer ones**. Everything written after the snapshot is lost.
 
 | Snapshot | When | Both servers |
 |---|---|---|
 | `clean` | OS + `harden-base.sh` + Docker done, nothing else | broke the setup → roll back, redo from there |
-| `frozen` | day before the event, challenges loaded, test run done, test data removed | event-day disaster (hacked, broken config) |
+| `frozen` | day before the event, challenges loaded, test run done, test data removed. **Delete `clean` first** (1 slot) | event-day disaster (hacked, broken config) |
 
 Event-day disaster on the **platform**: roll back to `frozen` (players and solves since then are gone), then bring them back
 from the newest backup on the GCP spare: copy `/srv/ctfd-backups/<newest>` to the platform (via your laptop), then

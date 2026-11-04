@@ -1,15 +1,18 @@
 # 03 · Platform (CTFd + plugin)
 
-## Why CTFd 3.7.7 exactly
+## Why CTFd 3.8.9 exactly
 
-The docker plugin is built and tested for **3.7.7**. Don't use the latest tag (3.8.x) without testing the plugin on it first.
+**3.8.9** (Oct 2026) fixes known security bugs in 3.7.7: zip path traversal on admin import (CVE-2026-30345), script-running links,
+a race that allowed extra flag attempts past the rate limit, non-public custom fields in the API. The plugin's 197 tests pass on it (4 Nov 2026).
+Don't jump to a newer tag without re-running the plugin tests (`tests/README.md`).
+The GCP sandbox still runs 3.7.7: an export from 3.7.7 imports fine into 3.8.9 (not the other way round).
 
 ## Install
 
 ```bash
 cd /opt/ctf
 git clone https://github.com/CTFd/CTFd.git
-cd CTFd && git checkout 3.7.7
+cd CTFd && git checkout 3.8.9
 
 cp -r /opt/ctf/CTFd-Docker-Challenges/docker_challenges CTFd/plugins/
 sudo docker compose up -d

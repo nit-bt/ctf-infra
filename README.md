@@ -41,7 +41,7 @@ It also holds `setup-docker-tls.sh` and the `firewall/` scripts.
 |---|---|---|
 | 1 | [docs/01-gcp-sandbox.md](docs/01-gcp-sandbox.md) | GCP project, org policies, VMs, firewall rules |
 | 2 | [docs/02-server-base.md](docs/02-server-base.md) | Team users, SSH, Docker (every server) |
-| 3 | [docs/03-platform.md](docs/03-platform.md) | CTFd 3.7.7 + plugin |
+| 3 | [docs/03-platform.md](docs/03-platform.md) | CTFd 3.8.9 + plugin |
 | 4 | [docs/04-challenge-server.md](docs/04-challenge-server.md) | Docker API TLS, connect to CTFd, firewall |
 | 5 | [docs/05-challenges.md](docs/05-challenges.md) | Building and adding instanced challenges |
 | 6 | [docs/06-testing.md](docs/06-testing.md) | End-to-end checklist |

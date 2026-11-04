@@ -4,7 +4,7 @@ Short record of what we chose and why, so we don't re-argue it.
 
 | Decision | Chosen | Over | Why |
 |---|---|---|---|
-| Platform | CTFd **3.7.7** | latest 3.8.x | the docker plugin is built/tested on 3.7.7 |
+| Platform | CTFd **3.8.9** | 3.7.7 (first sandbox) | security fixes; plugin's 197 tests pass on 3.8.9 |
 | Instances | docker plugin, **our multi-host fork** | CTFd-whale + Swarm | fewer moving parts (no frp, no overlay network); per-category servers are easy to reason about on event day; whale had a Cloudflare issue before |
 | Multiple servers | one server **per category**, chosen per challenge | one big server | one big server = single point of failure |
 | Orchestration | plain Docker | Kubernetes | plugin speaks Docker API only, no time to port; k8s overhead eats small servers; scale doesn't need it. Revisit in the home lab (k3s + kCTF/klodd) |
