@@ -2,7 +2,9 @@
 # Install CTFd + our docker plugin on a production platform server (Contabo). Safe to re-run.
 #   sudo ./scripts/setup-platform.sh
 # Does: CTFd $CTFD_VERSION in /opt/ctf/CTFd, plugin copied in, production override (no :8000, fixed
-# SECRET_KEY, random DB passwords in .env), build + start, health check. HTTPS comes after (docs/07).
+# SECRET_KEY, random DB passwords in .env), build + start, health check.
+# HTTPS: put the Cloudflare origin certificate in /opt/ctf/certs/origin.pem + origin.key (chmod 600) and
+# re-run: it then uses platform/docker-compose.override.https.yml (443, real IPs from Cloudflare, 80 -> 443).
 set -euo pipefail
 
 CTFD_VERSION=${CTFD_VERSION:-3.8.9}
@@ -28,7 +30,17 @@ rm -rf CTFd/plugins/docker_challenges
 cp -r "$PLUGIN" CTFd/plugins/
 
 echo "[3/5] Production settings (.env + override)"
-cp "$HERE/platform/docker-compose.override.yml" docker-compose.override.yml
+CERTS=/opt/ctf/certs
+if [[ -s $CERTS/origin.pem && -s $CERTS/origin.key ]]; then
+  openssl x509 -in "$CERTS/origin.pem" -noout 2>/dev/null || { echo "!! $CERTS/origin.pem is not a certificate"; exit 1; }
+  openssl pkey -in "$CERTS/origin.key" -noout 2>/dev/null || { echo "!! $CERTS/origin.key is not a private key"; exit 1; }
+  chmod 700 "$CERTS"; chmod 600 "$CERTS/origin.key"
+  cp "$HERE/platform/docker-compose.override.https.yml" docker-compose.override.yml
+  HTTPS=1; echo "      HTTPS on (certificate: $(openssl x509 -in "$CERTS/origin.pem" -noout -enddate | cut -d= -f2))"
+else
+  cp "$HERE/platform/docker-compose.override.yml" docker-compose.override.yml
+  HTTPS=0; echo "      HTTP only (no certificate in $CERTS yet)"
+fi
 if [[ ! -f .env ]]; then
   umask 077
   cat > .env <<ENV
@@ -56,5 +68,11 @@ up() { docker compose exec -T ctfd python -c "import urllib.request; urllib.requ
 for i in $(seq 60); do up && break; sleep 3; done
 if ! up; then echo "!! CTFd not answering: sudo docker compose -f $BASE/CTFd/docker-compose.yml logs --tail 50 ctfd"; exit 1; fi
 if docker compose port ctfd 8000 >/dev/null 2>&1; then echo "!! port 8000 is published, override not applied"; exit 1; fi
-echo "CTFd is up behind nginx on port 80 (8000 not public)."
-echo "Next: HTTPS + internal.ctfc.live (docs/07), then open the site for the setup wizard."
+docker compose exec -T nginx nginx -t -q || { echo "!! nginx config error (see above)"; exit 1; }
+if [[ $HTTPS == 1 ]]; then
+  echo "CTFd is up behind nginx on 443 (HTTPS, 80 redirects; 8000 not public)."
+  echo "Next: Cloudflare DNS record for the site (proxied), then sudo ./scripts/harden-platform.sh"
+else
+  echo "CTFd is up behind nginx on port 80 (8000 not public)."
+  echo "Next: open http://<server-ip>/setup NOW (setup wizard), then HTTPS (docs/07)."
+fi

@@ -44,18 +44,31 @@ CTFd 3.8.9 + plugin, plus the production changes **without editing CTFd's own co
 
 **4. More workers for ATC** *(to test)*: `WORKERS=1` is fine for 25 players; try 2-4 for 100 and load-test.
 
-## Domain + HTTPS *(to test)*
+## HTTPS + `internal.ctfc.live`
 
-Domain via GitHub Student Pack: **`.me` or `.tech`**. Not `.dev` / `.app`: browsers force HTTPS on those, which breaks `http://host:port` instances.
+Cloudflare proxied (🟠) + SSL mode **Full (strict)** + the Cloudflare **origin certificate** (`*.ctfc.live`, the same one
+the monitor VM uses in `/etc/caddy/`) on CTFd's nginx.
+
+1. Certificate onto the platform (copy the two files from the monitor VM, e.g. `sudo cat` there, paste here):
+   ```bash
+   sudo mkdir -p /opt/ctf/certs
+   sudo nano /opt/ctf/certs/origin.pem      # paste -----BEGIN CERTIFICATE----- ... END
+   sudo nano /opt/ctf/certs/origin.key      # paste -----BEGIN PRIVATE KEY----- ... END
+   ```
+2. `sudo /opt/ctf/ctf-infra/scripts/setup-platform.sh` again: sees the certificate, switches to
+   `platform/docker-compose.override.https.yml` + `platform/nginx-https.conf`:
+   443 with the origin certificate, 80 → 301 to HTTPS, **real player IPs from `CF-Connecting-IP`**
+   (otherwise CTFd sees Cloudflare's IPs and every player shares one rate limit).
+3. Cloudflare → DNS → **A** `internal` → platform IP, **Proxied** 🟠.
+4. `https://internal.ctfc.live` → CTFd.
 
 | Record | Points to | Cloudflare |
 |---|---|---|
 | `internal.ctfc.live` | platform IP | 🟠 proxied (hides IP, DDoS protection) |
-| `chal1.<domain>` … | challenge server IP | ⚪ DNS only (Cloudflare can't pass ports 30000-31000) |
+| `chal1.ctfc.live` … | challenge server IP | ⚪ DNS only (Cloudflare can't pass ports 30000-31000) |
 
-- Cloudflare SSL mode **Full (strict)** + **Origin certificate** on the platform's nginx (port 443)
-- Lock platform 80/443 to Cloudflare IP ranges (needs `DOCKER-USER` rules like the challenge firewall, since Docker skips `ufw`)
-- In Docker Config, set each server's **Public address** to `chalN.<domain>`, then moving servers = only a DNS change
+- In Docker Config, set each server's **Public address** to `chalN.ctfc.live`, then moving servers = only a DNS change
+- Then lock 80/443 to Cloudflare's IPs (`harden-platform.sh`), otherwise the raw IP skips Cloudflare
 
 ## Backups
 

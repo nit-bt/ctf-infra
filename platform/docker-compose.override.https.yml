@@ -1,0 +1,23 @@
+# Same as docker-compose.override.yml + HTTPS on nginx (Cloudflare origin certificate). docs/07.
+# setup-platform.sh copies this next to CTFd's compose file; values come from CTFd/.env (chmod 600).
+services:
+  ctfd:
+    ports: !reset []                 # no public :8000 (Docker-published ports skip ufw); only nginx is public
+    volumes:
+      # CTFd mounts its folder (.:/opt/CTFd) and flask auto-loads /opt/CTFd/.env, but our .env is chmod 600 root
+      # -> PermissionError, CTFd never starts. Hide it: the values already arrive as environment variables.
+      - /dev/null:/opt/CTFd/.env:ro
+    environment:
+      - SECRET_KEY=${SECRET_KEY}     # fixed key: players stay logged in across restarts
+      - DATABASE_URL=mysql+pymysql://ctfd:${DB_PASSWORD}@db/ctfd
+      - WORKERS=${WORKERS:-2}
+  db:
+    environment:
+      - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MARIADB_PASSWORD=${DB_PASSWORD}
+  nginx:
+    ports:
+      - "443:443"
+    volumes:
+      - /opt/ctf/ctf-infra/platform/nginx-https.conf:/etc/nginx/nginx.conf:ro
+      - /opt/ctf/certs:/etc/nginx/certs:ro
