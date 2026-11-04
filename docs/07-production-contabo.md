@@ -70,6 +70,20 @@ the monitor VM uses in `/etc/caddy/`) on CTFd's nginx.
 - In Docker Config, set each server's **Public address** to `chalN.ctfc.live`, then moving servers = only a DNS change
 - Then lock 80/443 to Cloudflare's IPs (`harden-platform.sh`), otherwise the raw IP skips Cloudflare
 
+## Hardening (both servers, after `setup-users.sh harden-ssh`)
+
+```bash
+sudo /opt/ctf/ctf-infra/scripts/harden-base.sh        # ufw (SSH only), fail2ban, security updates, Copy Fail fix
+sudo /opt/ctf/ctf-infra/scripts/harden-platform.sh    # platform only: 80/443 answer only Cloudflare
+```
+- Challenge server: run `harden-chal-host.sh <platform-ip>` (plugin repo) **first**, then `harden-base.sh`: it reads the
+  platform IP from that config and allows 2376 from it in ufw.
+- `harden-platform.sh` puts its rules in Docker's `DOCKER-USER` chain (Docker skips ufw), re-applied on every Docker start
+  (`ctf-platform-firewall.service`). Anything else a container publishes by mistake is dropped too.
+- Check from a laptop: `http://<platform-ip>` times out, `https://internal.ctfc.live` works.
+- Undo if the site breaks: `sudo ctf-platform-firewall remove`.
+- Event day: stop automatic updates/reboots: `sudo systemctl stop unattended-upgrades apt-daily.timer apt-daily-upgrade.timer`.
+
 ## Backups
 
 ```bash
