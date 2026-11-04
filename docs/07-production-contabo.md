@@ -27,23 +27,20 @@ So on Contabo:
 - `harden-chal-host.sh <platform-public-ip>`, Docker API then only answers the platform
 - Docker API address in CTFd = challenge server's public IP `:2376`
 
-## Platform: changes to CTFd's compose file
+## Platform: install
 
-**1. Remove the public port 8000.** Docker-published ports skip `ufw`, so this would expose CTFd directly. In `docker-compose.yml`, under `ctfd:` delete:
-```yaml
-    ports:
-      - "8000:8000"
-```
-
-**2. Fixed secret key** (otherwise everyone is logged out on every restart):
 ```bash
-cd /opt/ctf/CTFd
-echo "SECRET_KEY=$(openssl rand -hex 32)" > .env
-chmod 600 .env
+sudo /opt/ctf/ctf-infra/scripts/setup-platform.sh
 ```
-and under `ctfd: environment:` add `- SECRET_KEY=${SECRET_KEY}`. Back up `.env` with the DB.
+CTFd 3.8.9 + plugin, plus the production changes **without editing CTFd's own compose file**
+(`platform/docker-compose.override.yml`, values in `/opt/ctf/CTFd/.env`, chmod 600, random on first run):
 
-**3. Change DB passwords** from `ctfd` (`MARIADB_PASSWORD`, `MARIADB_ROOT_PASSWORD`, and the password in `DATABASE_URL`). DB is on an internal-only network, but don't ship defaults.
+1. **No public port 8000.** Docker-published ports skip `ufw`; only nginx (80, later 443) is public.
+2. **Fixed `SECRET_KEY`** (otherwise everyone is logged out on every restart).
+3. **Random DB passwords** instead of `ctfd`.
+4. `WORKERS=2`.
+
+`.env` is in every backup (`backup-ctfd.sh`), and `restore-ctfd.sh` puts it back. Never commit it.
 
 **4. More workers for ATC** *(to test)*: `WORKERS=1` is fine for 25 players; try 2-4 for 100 and load-test.
 
