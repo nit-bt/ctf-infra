@@ -86,6 +86,10 @@ sudo /opt/ctf/ctf-infra/scripts/harden-platform.sh    # platform only: 80/443 an
 
 ## Backups
 
+**Now (Nov 2026):** hourly cron on the Contabo platform, each backup pushed to **`ctf-monitor`** (Always Free e2-micro,
+`setup-backup-receiver.sh`, keeps 200), because the GCP platform VM is stopped until event week.
+Event week: start the GCP spare, point `OFFSITE` at it instead (docs/failover.md), so a restore there needs no copying.
+
 ```bash
 sudo /opt/ctf/ctf-infra/scripts/backup-ctfd.sh
 scp <user>@<platform>:/opt/ctf/backups/ctfd-*.tar.gz .
