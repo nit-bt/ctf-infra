@@ -102,3 +102,19 @@ Logo and favicon are easiest in the admin panel.
 | ![](previews/popup.png) | ![](previews/score.png) |
 
 Mobile: [previews/home-mob.png](previews/home-mob.png)
+
+## Seasons (temporary looks)
+
+A season is an extra layer on top of the club theme: colours, the page-title bar and a home page.
+It never touches challenges, flags, users or solves.
+
+```bash
+SEASON=water-festival URL=https://internal.ctfc.live TOKEN=ctfd_xxx ./apply.sh   # on
+URL=https://internal.ctfc.live TOKEN=ctfd_xxx ./apply.sh                         # back to normal
+```
+
+| Season | Files | Look |
+|---|---|---|
+| `water-festival` (Bon Om Touk, Nov 23-25) | `seasons/water-festival.html`, `seasons/water-festival-index.html` | night river: navy, teal, lantern orange, full-moon gold. Captured = gold. Home: បុណ្យអុំទូក + pixel river with race boats, a lit float and the full moon (`seasons/make-water-festival-scene.py` draws it) |
+
+Previews: `previews/water-festival-*.png` (fonts there are fallbacks; the real site loads them from Google Fonts).

@@ -1,0 +1,68 @@
+<!-- CTFC season layer: Water Festival (Bon Om Touk). apply.sh appends this AFTER theme-header.html
+     when SEASON=water-festival. Only colours, the title bar and the home-page scene change;
+     challenges, flags and the Docker plugin are untouched. Remove: run apply.sh without SEASON. -->
+<link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@500&display=swap" rel="stylesheet">
+<style>
+/* night river: navy water, teal current, lantern orange, full-moon gold */
+:root, [data-bs-theme="dark"] {
+  --ctfc-night: #0e1a2b;
+  --ctfc-night-2: #15263b;
+  --ctfc-night-3: #1d3350;
+  --ctfc-plum: #1f6f78;        /* the "ribbon" colour becomes the river */
+  --ctfc-plum-hi: #2a8f97;
+  --ctfc-red: #d9772b;         /* to capture / act = lantern */
+  --ctfc-red-dk: #8f4314;
+  --ctfc-blue: #1f6f78;
+  --ctfc-blue-dk: #134a52;
+  --wf-moon: #f2c75c;
+  --wf-moon-dk: #c99a3e;
+  --ctfc-muted: #a9b6c9;
+  --bs-border-color: #2a4262;
+  --bs-link-color: #8fd0d6;
+  --bs-link-color-rgb: 143, 208, 214;
+}
+.challenges-row > div, .ctfc-hero img { filter: drop-shadow(0 var(--ctfc-px) 0 #08111d); }
+.navbar.bg-dark { box-shadow: 0 4px 0 #08111d; }
+.challenge-submit.btn:hover, #docker_container .btn-dark:hover, .btn-danger:hover, .ctfc-cta:hover { background: #e88a3e; }
+.btn-primary:hover, .btn-info:hover, .btn-file:hover { background: #2a8f97; }
+.ctfc-plate, #warningModal .modal-footer { box-shadow: inset 0 0 0 2px #2a4262; }
+.table { --bs-table-border-color: #2a4262; }
+
+/* page-title bar: a little stepped wave instead of the ribbon */
+.jumbotron h1::after {
+  width: 9rem; height: 8px;
+  background:
+    linear-gradient(90deg, var(--ctfc-plum-hi) 0 50%, transparent 0) 0 0 / 16px 4px repeat-x,
+    linear-gradient(var(--ctfc-plum) 0 0) 0 4px / 100% 4px no-repeat;
+}
+
+/* captured = full-moon gold */
+[data-bs-theme] .challenge-button.challenge-solved, [data-bs-theme] .challenge-button.challenge-solved:hover {
+  background: var(--wf-moon); color: var(--ctfc-ink);
+  box-shadow: inset 0 calc(var(--ctfc-px) * -1) 0 var(--wf-moon-dk);
+}
+[data-bs-theme] .challenge-button.challenge-solved::before {
+  background:
+    linear-gradient(var(--ctfc-ink) 0 0) 2px 0 / 12px 8px no-repeat,
+    linear-gradient(#5a4a2a 0 0) 2px 8px / 12px 2px no-repeat,
+    linear-gradient(var(--ctfc-ink) 0 0) 0 0 / 2px 18px no-repeat;
+}
+[data-bs-theme] .challenge-button.challenge-solved:focus-visible { outline-color: var(--ctfc-ink) !important; }
+.alert-success { background: var(--ctfc-plum); }
+.ctfc-win-box { background: var(--ctfc-plum); box-shadow: inset 0 -6px 0 var(--ctfc-blue-dk); }
+
+/* home page: Khmer festival name + the river scene */
+.wf-kh { font-family: "Kantumruy Pro", var(--ctfc-text); font-weight: 500; color: var(--wf-moon); font-size: clamp(1.3rem, 2.4vw, 1.75rem); line-height: 1.6; margin: -.5rem 0 1rem; }
+.wf-river { margin: 0 calc(50% - 50vw) 2.5rem; background: linear-gradient(#0b1626, #0e1a2b 60%); }
+.wf-scene { display: block; width: 100%; max-width: 1400px; height: auto; margin: 0 auto; }
+.wf-waves { animation: wf-sway 2.4s steps(1) infinite; }
+.wf-boat { animation: wf-bob 1.6s steps(1) infinite; }
+.boat-b { animation-duration: 2.1s; animation-delay: -.7s; }
+@keyframes wf-sway { 50% { transform: translateX(2px); } }
+@keyframes wf-bob { 50% { transform: translateY(1px); } }
+@media (prefers-reduced-motion: reduce) { .wf-waves, .wf-boat { animation: none; } }
+</style>
+<script>
+  /* confetti in festival colours: lantern, moon, river, cream */
+  window.CTFC_CONFETTI = ["#d9772b", "#f2c75c", "#2a8f97", "#f4f5ed", "#e88a3e", "#8fd0d6"];
+</script>

@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Apply the CTFC branding to a CTFd instance through its API.
 # Usage: URL=http://localhost:8000 TOKEN=ctfd_xxx ./apply.sh
+#        SEASON=water-festival URL=... TOKEN=... ./apply.sh     # + seasons/<name>.html (+ <name>-index.html)
+#        run again WITHOUT SEASON to go back to the normal club theme.
+# Only touches the theme header, logo, favicon and the home page: never challenges, flags, users or solves.
 # Get TOKEN from CTFd as admin: Settings > Access Tokens > Generate.
 # Safe to run again: it re-uploads the images and overwrites theme, logo, favicon and home page.
 set -euo pipefail
@@ -22,12 +25,21 @@ LOGO=$(upload ctfc-logo.png)
 BADGE=$(upload ctfc-logo.png)   # navbar: full logo
 ICON=$(upload favicon.ico)
 
+HEADER=theme-header.html
+INDEX=index-page.html
+if [ -n "${SEASON:-}" ]; then
+  [ -f "seasons/$SEASON.html" ] || { echo "no seasons/$SEASON.html"; exit 1; }
+  cat theme-header.html "seasons/$SEASON.html" > /tmp/ctfc-header.$$; HEADER=/tmp/ctfc-header.$$
+  [ -f "seasons/$SEASON-index.html" ] && INDEX="seasons/$SEASON-index.html"
+  echo "season: $SEASON"
+fi
+
 echo "theme, logo, favicon..."
-jq -n --rawfile h theme-header.html --arg b "$BADGE" --arg i "$ICON" \
+jq -n --rawfile h "$HEADER" --arg b "$BADGE" --arg i "$ICON" \
   '{ctf_theme:"core-beta", theme_header:$h, ctf_logo:$b, ctf_small_icon:$i}' | patch_cfg
 
 echo "home page..."
-HTML=$(sed "s#LOGO_URL#/files/$LOGO#" index-page.html)
+HTML=$(sed "s#LOGO_URL#/files/$LOGO#" "$INDEX")
 ID=$(curl -fsS -H "$H" -H "Content-Type: application/json" "$URL/api/v1/pages" | jq -r '.data[] | select(.route=="index") | .id' | head -1)
 BODY=$(jq -n --arg c "$HTML" '{title:"Home", route:"index", format:"html", content:$c, draft:false, hidden:false, auth_required:false}')
 if [ -n "$ID" ]; then
@@ -36,4 +48,5 @@ else
   curl -fsS -o /dev/null -X POST  -H "$H" -H 'Content-Type: application/json' -d "$BODY" "$URL/api/v1/pages"
 fi
 
+rm -f /tmp/ctfc-header.$$
 echo "done. open $URL in a private window to check."
