@@ -39,7 +39,12 @@ jq -n --rawfile h "$HEADER" --arg b "$BADGE" --arg i "$ICON" \
   '{ctf_theme:"core-beta", theme_header:$h, ctf_logo:$b, ctf_small_icon:$i}' | patch_cfg
 
 echo "home page..."
-HTML=$(sed "s#LOGO_URL#/files/$LOGO#" "$INDEX")
+ART_SUB=""
+if [ -n "${SEASON:-}" ]; then
+  ART=$(ls seasons/"$SEASON"-art.* 2>/dev/null | head -1)
+  [ -n "$ART" ] && ART_SUB=$(upload "$ART") && echo "season art: $ART"
+fi
+HTML=$(sed -e "s#LOGO_URL#/files/$LOGO#" -e "s#ART_URL#/files/$ART_SUB#" "$INDEX")
 ID=$(curl -fsS -H "$H" -H "Content-Type: application/json" "$URL/api/v1/pages" | jq -r '.data[] | select(.route=="index") | .id' | head -1)
 BODY=$(jq -n --arg c "$HTML" '{title:"Home", route:"index", format:"html", content:$c, draft:false, hidden:false, auth_required:false}')
 if [ -n "$ID" ]; then
