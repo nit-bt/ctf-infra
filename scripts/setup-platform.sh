@@ -67,7 +67,9 @@ echo "[5/5] Health check"
 up() { docker compose exec -T ctfd python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/', timeout=5)" >/dev/null 2>&1; }
 for i in $(seq 60); do up && break; sleep 3; done
 if ! up; then echo "!! CTFd not answering: sudo docker compose -f $BASE/CTFd/docker-compose.yml logs --tail 50 ctfd"; exit 1; fi
-if docker compose port ctfd 8000 >/dev/null 2>&1; then echo "!! port 8000 is published, override not applied"; exit 1; fi
+# "docker compose port" exits 0 even for an unpublished port (prints ":0"), so look at what Docker publishes
+if docker compose ps ctfd --format '{{.Ports}}' | grep -qE '(0\.0\.0\.0|\[?::\]?):8000->'; then
+  echo "!! port 8000 is published, override not applied"; exit 1; fi
 docker compose exec -T nginx nginx -t -q || { echo "!! nginx config error (see above)"; exit 1; }
 if [[ $HTTPS == 1 ]]; then
   echo "CTFd is up behind nginx on 443 (HTTPS, 80 redirects; 8000 not public)."
